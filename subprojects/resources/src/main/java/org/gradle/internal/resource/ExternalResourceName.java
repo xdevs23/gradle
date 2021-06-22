@@ -37,7 +37,7 @@ public class ExternalResourceName implements Describable {
 
     public ExternalResourceName(URI uri) {
         if (uri.getPath() == null) {
-            throw new IllegalArgumentException(format("Cannot create resource name from non-hierarchical URI '%s'.", uri.toString()));
+            throw new IllegalArgumentException(format("Cannot create resource name from non-hierarchical URI '%s'.", uri));
         }
         this.encodedRoot = encodeRoot(uri);
         this.path = extractPath(uri);
@@ -45,7 +45,7 @@ public class ExternalResourceName implements Describable {
     }
 
     public ExternalResourceName(String path) {
-        encodedRoot = null;
+        this.encodedRoot = null;
         this.path = path;
         this.encodedQuery = "";
     }
@@ -58,30 +58,30 @@ public class ExternalResourceName implements Describable {
 
     public ExternalResourceName(URI parent, String path) {
         if (parent.getPath() == null) {
-            throw new IllegalArgumentException(format("Cannot create resource name from non-hierarchical URI '%s'.", parent.toString()));
-        }
-        String newPath;
-        String parentPath = extractPath(parent);
-        if (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        if (path.length() == 0) {
-            newPath = parentPath;
-        } else if (parentPath.endsWith("/")) {
-            newPath = parentPath + path;
-        } else {
-            newPath = parentPath + "/" + path;
+            throw new IllegalArgumentException(format("Cannot create resource name from non-hierarchical URI '%s'.", parent));
         }
         this.encodedRoot = encodeRoot(parent);
-        this.path = newPath;
+        this.path = combine(parent, path);
         this.encodedQuery = "";
     }
 
-    private boolean isFileOnHost(URI uri) {
+    private static String combine(URI parent, String path) {
+        String parentPath = extractPath(parent);
+        String childPath = path.startsWith("/") ? path.substring(1) : path;
+        if (childPath.length() == 0) {
+            return parentPath;
+        } else if (parentPath.endsWith("/")) {
+            return parentPath + childPath;
+        } else {
+            return parentPath + "/" + childPath;
+        }
+    }
+
+    private static boolean isFileOnHost(URI uri) {
         return "file".equals(uri.getScheme()) && uri.getPath().startsWith("//");
     }
 
-    private String extractPath(URI parent) {
+    private static String extractPath(URI parent) {
         if (isFileOnHost(parent)) {
             return URI.create(parent.getPath()).getPath();
         }
@@ -231,12 +231,11 @@ public class ExternalResourceName implements Describable {
         boolean trailingSlash = path.endsWith("/");
         if (path.startsWith("/")) {
             leadingSlash = true;
-            append(path, parts);
         } else {
             leadingSlash = this.path.startsWith("/");
             append(this.path, parts);
-            append(path, parts);
         }
+        append(path, parts);
         String newPath = join(leadingSlash, trailingSlash, parts);
         return new ExternalResourceName(encodedRoot, newPath);
     }
