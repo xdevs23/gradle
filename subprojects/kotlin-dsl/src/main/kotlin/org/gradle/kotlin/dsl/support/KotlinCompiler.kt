@@ -46,7 +46,7 @@ import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.JVMConfigurationKeys.JVM_TARGET
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.JVMConfigurationKeys.OUTPUT_DIRECTORY
 import org.jetbrains.kotlin.config.JVMConfigurationKeys.RETAIN_OUTPUT_IN_MEMORY
 import org.jetbrains.kotlin.config.JvmAnalysisFlags
@@ -341,9 +341,10 @@ class LoggingOutputStream(val log: (String) -> Unit) : OutputStream() {
 private
 fun compilerConfigurationFor(messageCollector: MessageCollector): CompilerConfiguration =
     CompilerConfiguration().apply {
-        put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
-        put(JVM_TARGET, JVM_1_8)
-        put(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS, gradleKotlinDslLanguageVersionSettings)
+        put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector) // capture errors via custom message collector
+        put(JVMConfigurationKeys.JVM_TARGET, JVM_1_8) // target Java 8 bytecode
+        put(JVMConfigurationKeys.IR, true) // enable new IR backend
+        put(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS, gradleKotlinDslLanguageVersionSettings) // enforce API/behavior level for Kotlin scripts
     }
 
 
