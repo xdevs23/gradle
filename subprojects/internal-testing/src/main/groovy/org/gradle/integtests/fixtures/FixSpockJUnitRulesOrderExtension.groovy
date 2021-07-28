@@ -34,7 +34,7 @@ class FixSpockJUnitRulesOrderExtension extends AbstractGlobalExtension {
     void visitSpec(SpecInfo spec) {
         spec.addListener(new AbstractRunListener() {
             @Override
-            void beforeFeature(FeatureInfo feature) {
+            synchronized void beforeFeature(FeatureInfo feature) {
                 feature.iterationInterceptors.findAll { it instanceof TestRuleInterceptor }.each { TestRuleInterceptor interceptor ->
                     interceptor.ruleFields.sort(new Comparator<FieldInfo>() {
                         @Override
