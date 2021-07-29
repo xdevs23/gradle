@@ -63,6 +63,12 @@ public class DefaultCommandLineToolInvocationWorker implements CommandLineToolIn
             toolExec.workingDir(invocation.getWorkDirectory());
         }
 
+        System.out.println("*******");
+        System.out.println("Tool path: " + invocation.getPath());
+        System.out.println("Tool work dir: " + invocation.getWorkDirectory());
+        System.out.println("Tool args: " + invocation.getArgs());
+        System.out.println("Tool environment: " + invocation.getEnvironment());
+        System.out.println("*******");
         toolExec.args(invocation.getArgs());
 
         if (!invocation.getPath().isEmpty()) {
