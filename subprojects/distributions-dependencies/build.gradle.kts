@@ -51,6 +51,7 @@ dependencies {
         api(libs.commonsHttpclient)     { version { strictly("4.5.13") }}
         api(libs.commonsIo)             { version { strictly("2.6") }}
         api(libs.commonsLang)           { version { strictly("2.6") }}
+        api(libs.commonsLang3)          { version { strictly("3.12.0") }}
         api(libs.commonsMath)           { version { strictly("3.6.1") }}
         api(libs.fastutil)              { version { strictly("8.5.2") }}
         api(libs.gcs)                   { version { strictly("v1-rev171-1.25.0") }}
@@ -144,7 +145,6 @@ dependencies {
         api(libs.bytebuddyAgent)        { version { strictly(bytebuddyVersion) }}
         api(libs.cglib)                 { version { strictly("3.2.6") }}
         api(libs.equalsverifier)        { version { strictly("2.1.6") }}
-        api(libs.flightrecorder)        { version { strictly("7.0.0-alpha01") }}
         api(libs.guice)                 { version { strictly("4.2.3") }}
         api(libs.httpmime)              { version { strictly("4.5.10") }}
         api(libs.jacksonKotlin)         { version { strictly("2.9.2") }}
@@ -156,7 +156,7 @@ dependencies {
         api(libs.jtar)                  { version { strictly("2.3") }}
         api(libs.kotlinCoroutines)      { version { strictly("1.4.1") }}
         api(libs.kotlinCoroutinesDebug) { version { strictly("1.4.1") }}
-        api(libs.littleproxy)           { version { strictly("1.1.3"); because("latest officially released version is incompatible with Guava >= 20") }}
+        api(libs.littleproxy)           { version { strictly("2.0.5") }}
         api(libs.mina)                  { version { strictly("2.0.17") }}
         api(libs.mockitoCore)           { version { strictly("3.7.7") }}
         api(libs.mockitoKotlin)         { version { strictly("1.6.0") }}
