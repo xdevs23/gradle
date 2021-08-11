@@ -120,21 +120,19 @@ public class DefaultManifestMergeSpec implements ManifestMergeSpec {
     }
 
     private DefaultManifestMergeDetails getMergeDetails(String section, String key, Object baseValue, Object mergeValue) {
-        Object value = null;
-        value = mergeValue == null ? baseValue : mergeValue;
-        return new DefaultManifestMergeDetails(section, key, nullableToString(baseValue), nullableToString(mergeValue), value);
-    }
-
-    private String nullableToString(Object value) { //todo: does Guava have it?
-        return value == null ? null : value.toString();
+        String value = null;
+        String baseValueString = baseValue != null ? baseValue.toString() : null;
+        String mergeValueString = mergeValue != null ? mergeValue.toString() : null;
+        value = mergeValueString == null ? baseValueString : mergeValueString;
+        return new DefaultManifestMergeDetails(section, key, baseValueString, mergeValueString, value);
     }
 
     private void addMergeDetailToManifest(String section, DefaultManifest mergedManifest, DefaultManifestMergeDetails mergeDetails) {
         if (!mergeDetails.isExcluded()) {
             if (section == null) {
-                mergedManifest.attributes(WrapUtil.toMap(mergeDetails.getKey(), mergeDetails.getRawValue()));
+                mergedManifest.attributes(WrapUtil.toMap(mergeDetails.getKey(), mergeDetails.getValue()));
             } else {
-                mergedManifest.attributes(WrapUtil.toMap(mergeDetails.getKey(), mergeDetails.getRawValue()), section);
+                mergedManifest.attributes(WrapUtil.toMap(mergeDetails.getKey(), mergeDetails.getValue()), section);
             }
         }
     }
