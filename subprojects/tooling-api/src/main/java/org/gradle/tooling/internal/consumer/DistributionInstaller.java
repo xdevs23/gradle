@@ -103,8 +103,7 @@ public class DistributionInstaller {
 
         @Override
         public void downloadStatusChanged(URI address, long contentLength, long downloaded) {
-            String eventDisplayName = descriptor.getDisplayName() + " " + downloaded + "/" + contentLength + " bytes downloaded";
-            StatusEvent statusEvent = new DefaultStatusEvent(clock.getCurrentTime(), eventDisplayName, descriptor, contentLength, downloaded, "bytes");
+            StatusEvent statusEvent = new DefaultStatusEvent(clock.getCurrentTime(), descriptor, contentLength, downloaded, "bytes");
             // This is called from the download thread. Only forward the events when not cancelled
             currentListener.get().onEvent(statusEvent);
         }
