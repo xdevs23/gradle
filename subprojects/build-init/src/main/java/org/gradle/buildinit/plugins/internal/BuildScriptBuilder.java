@@ -191,6 +191,13 @@ public class BuildScriptBuilder {
     }
 
     /**
+     * Creates a static method invocation expression, to use as a method argument or the RHS of a property assignment.
+     */
+    public Expression staticMethodInvocationExpression(String className, String methodName, Object... methodArgs) {
+        return new MethodInvocationExpression(new LiteralValue(className), methodName, expressionValues(methodArgs));
+    }
+
+    /**
      * Creates a property expression, to use as a method argument or the RHS of a property assignment.
      */
     public Expression propertyExpression(String value) {
@@ -353,7 +360,6 @@ public class BuildScriptBuilder {
      * Creates an element in the given container.
      *
      * @param varName A variable to use to reference the element, if required by the DSL. If {@code null}, then use the element name.
-     *
      * @return An expression that can be used to refer to the element later in the script.
      */
     public Expression createContainerElement(@Nullable String comment, String container, String elementName, @Nullable String varName) {
@@ -984,7 +990,7 @@ public class BuildScriptBuilder {
                 ScriptBlockImpl constraintsBlock = new ScriptBlockImpl();
                 for (String config : this.constraints.keySet()) {
                     for (Statement constraintSpec : this.constraints.get(config)) {
-                            constraintsBlock.add(constraintSpec);
+                        constraintsBlock.add(constraintSpec);
                     }
                 }
                 printer.printBlock("constraints", constraintsBlock);
@@ -1003,7 +1009,7 @@ public class BuildScriptBuilder {
             if (!constraints.isEmpty()) {
                 ScriptBlock constraintsBlock = new ScriptBlock(null, "constraints");
                 for (String config : constraints.keySet()) {
-                    for(Statement statement : constraints.get(config)) {
+                    for (Statement statement : constraints.get(config)) {
                         constraintsBlock.add(statement);
                     }
                 }

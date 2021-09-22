@@ -95,7 +95,7 @@ public class LanguageSpecificAdaptor implements ProjectGenerator {
 
     public Map<String, List<String>> generateWithExternalComments(InitSettings settings) {
         HashMap<String, List<String>> comments = new HashMap<>();
-        for(BuildScriptBuilder buildScriptBuilder : allBuildScriptBuilder(settings)) {
+        for (BuildScriptBuilder buildScriptBuilder : allBuildScriptBuilder(settings)) {
             buildScriptBuilder.withExternalComments().create(settings.getTarget()).generate();
             comments.put(buildScriptBuilder.getFileNameWithoutExtension(), buildScriptBuilder.extractComments());
         }
@@ -104,7 +104,7 @@ public class LanguageSpecificAdaptor implements ProjectGenerator {
 
     @Override
     public void generate(InitSettings settings) {
-        for(BuildScriptBuilder buildScriptBuilder : allBuildScriptBuilder(settings)) {
+        for (BuildScriptBuilder buildScriptBuilder : allBuildScriptBuilder(settings)) {
             buildScriptBuilder.create(settings.getTarget()).generate();
         }
     }
@@ -114,8 +114,12 @@ public class LanguageSpecificAdaptor implements ProjectGenerator {
 
         if (settings.getModularizationOption() == ModularizationOption.WITH_LIBRARY_PROJECTS) {
             builder.add(buildSrcSetup(settings));
-            for(String conventionPluginName: SAMPLE_CONVENTION_PLUGINS) {
-                builder.add(conventionPluginScriptBuilder(conventionPluginName, settings));
+            for (String conventionPluginName : SAMPLE_CONVENTION_PLUGINS) {
+                BuildScriptBuilder conventionPluginScriptBuilder = conventionPluginScriptBuilder(conventionPluginName, settings);
+                if ("common".equals(conventionPluginName) && getLanguage() == Language.KOTLIN) {
+                    javaToolchainLanguageVersion(conventionPluginScriptBuilder, 8);
+                }
+                builder.add(conventionPluginScriptBuilder);
             }
         }
 
@@ -154,5 +158,13 @@ public class LanguageSpecificAdaptor implements ProjectGenerator {
             "buildSrc/src/main/" + settings.getDsl().name().toLowerCase() + "/" + settings.getPackageName() + "." + getLanguage().getName() + "-" + conventionPluginName + "-conventions");
         descriptor.generateConventionPluginBuildScript(conventionPluginName, settings, buildScriptBuilder);
         return buildScriptBuilder;
+    }
+
+    private void javaToolchainLanguageVersion(BuildScriptBuilder buildScriptBuilder, int javaVersion) {
+        buildScriptBuilder.block(null, "java", javaBuilder ->
+            javaBuilder.block("Use a Java 8 toolchain", "toolchain", toolchainBuilder ->
+                toolchainBuilder.propertyAssignment(null, "languageVersion", buildScriptBuilder.staticMethodInvocationExpression("JavaLanguageVersion", "of", javaVersion), false)
+            )
+        );
     }
 }
