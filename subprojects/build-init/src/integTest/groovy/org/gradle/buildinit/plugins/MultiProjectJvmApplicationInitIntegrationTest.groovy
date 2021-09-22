@@ -16,8 +16,10 @@
 
 package org.gradle.buildinit.plugins
 
+import org.gradle.api.JavaVersion
 import org.gradle.buildinit.plugins.fixtures.ScriptDslFixture
 import org.gradle.buildinit.plugins.internal.modifiers.BuildInitDsl
+import org.gradle.integtests.fixtures.AvailableJavaHomes
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
 import spock.lang.Unroll
 
@@ -25,6 +27,8 @@ import static org.gradle.buildinit.plugins.internal.modifiers.Language.GROOVY
 import static org.gradle.buildinit.plugins.internal.modifiers.Language.JAVA
 import static org.gradle.buildinit.plugins.internal.modifiers.Language.KOTLIN
 import static org.gradle.buildinit.plugins.internal.modifiers.Language.SCALA
+import static org.hamcrest.Matchers.notNullValue
+import static org.junit.Assume.assumeThat
 
 class MultiProjectJvmApplicationInitIntegrationTest extends AbstractInitIntegrationSpec {
     @Override
@@ -35,6 +39,15 @@ class MultiProjectJvmApplicationInitIntegrationTest extends AbstractInitIntegrat
     @Unroll("creates multi-project application sample for #jvmLanguage with #scriptDsl build scripts")
     def "creates multi-project application sample"() {
         given:
+        if (jvmLanguage == KOTLIN) {
+            def jdk8 = AvailableJavaHomes.getJdk(JavaVersion.VERSION_1_8)
+            assumeThat("Available JDK 8", jdk8, notNullValue())
+            executer.beforeExecute {
+                withArgument("-Porg.gradle.java.installations.paths=" + jdk8.javaHome.absolutePath)
+            }
+        }
+
+        and:
         def dsl = scriptDsl as BuildInitDsl
         def language = jvmLanguage.name
         def ext = jvmLanguage.extension
