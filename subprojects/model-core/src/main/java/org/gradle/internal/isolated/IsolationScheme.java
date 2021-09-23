@@ -168,6 +168,7 @@ public class IsolationScheme<IMPLEMENTATION, PARAMS> {
                 if (serviceClass.isAssignableFrom(ProviderFactory.class)) {
                     return allServices.find(ProviderFactory.class);
                 }
+                // HERE
                 for (Class<?> whiteListedService : additionalWhiteListedServices) {
                     if (serviceClass.isAssignableFrom(whiteListedService)) {
                         return allServices.find(whiteListedService);

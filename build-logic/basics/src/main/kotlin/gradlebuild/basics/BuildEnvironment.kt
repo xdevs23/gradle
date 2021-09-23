@@ -85,6 +85,7 @@ fun toPreTestedCommitBaseBranch(actualBranch: String): String = when {
 }
 
 
+// HERE
 object BuildEnvironment {
 
     const val CI_ENVIRONMENT_VARIABLE = "CI"

@@ -107,7 +107,7 @@ public class BuildServiceProvider<T extends BuildService<P>, P extends BuildServ
                 ServiceLookup instantiationServices = isolationScheme.servicesForImplementation(
                     isolatedParameters,
                     internalServices,
-                    ImmutableList.of(LoggingOutput.class),
+                    ImmutableList.of(LoggingOutput.class), // HERE
                     serviceType -> false
                 );
                 try {

@@ -88,6 +88,7 @@ if ((project.gradle as GradleInternal).services.get(BuildType::class.java) != Bu
 }
 
 fun monitorUnexpectedCacheMisses() {
+    // HERE
     gradle.taskGraph.afterTask {
         if (buildCacheEnabled() && isCacheMiss() && isNotTaggedYet()) {
             buildScan?.tag("CACHE_MISS")
@@ -135,9 +136,10 @@ fun isExpectedCompileCacheMiss() =
         "Check_Gradleception"
     )
 
-fun isInBuild(vararg buildTypeIds: String) = System.getenv("BUILD_TYPE_ID")?.let { currentBuildTypeId ->
-    buildTypeIds.any { currentBuildTypeId.endsWith(it) }
-} ?: false
+fun isInBuild(vararg buildTypeIds: String): Boolean =
+    providers.environmentVariable("BUILD_TYPE_ID").forUseAtConfigurationTime().orNull
+        ?.let { currentBuildTypeId -> buildTypeIds.any { currentBuildTypeId.endsWith(it) } }
+        ?: false
 
 fun extractCheckstyleAndCodenarcData() {
 
@@ -167,6 +169,7 @@ fun extractCheckstyleAndCodenarcData() {
     }
 }
 
+// HERE
 fun isEc2Agent() = InetAddress.getLocalHost().hostName.startsWith("ip-")
 
 fun Project.extractCiData() {
@@ -190,7 +193,7 @@ fun Project.extractCiData() {
 }
 
 fun BuildScanExtension.whenEnvIsSet(envName: String, action: BuildScanExtension.(envValue: String) -> Unit) {
-    val envValue: String? = System.getenv(envName)
+    val envValue = providers.environmentVariable(envName).forUseAtConfigurationTime().orNull
     if (!envValue.isNullOrEmpty()) {
         action(envValue)
     }
@@ -231,7 +234,10 @@ open class FileSystemWatchingBuildOperationListener(private val buildOperationLi
 
 fun Project.extractAllReportsFromCI() {
     val capturedReportingTypes = listOf("html") // can add xml, text, junitXml if wanted
-    val basePath = "${System.getenv("BUILD_SERVER_URL")}/repository/download/${System.getenv("BUILD_TYPE_ID")}/${System.getenv("BUILD_ID")}:id/.teamcity/gradle-logs"
+    val buildServerUrl = providers.environmentVariable("BUILD_SERVER_URL").forUseAtConfigurationTime().get()
+    val buildTypeId = providers.environmentVariable("BUILD_TYPE_ID").forUseAtConfigurationTime().get()
+    val buildId = providers.environmentVariable("BUILD_ID").forUseAtConfigurationTime().get()
+    val basePath = "$buildServerUrl/repository/download/$buildTypeId/$buildId:id/.teamcity/gradle-logs"
 
     gradle.taskGraph.afterTask {
         if (state.failure != null && this is Reporting<*>) {
