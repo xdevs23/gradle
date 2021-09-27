@@ -129,15 +129,26 @@ public class MyTest {
         then:
         executedAndNotSkipped ':test'
 
+        def result = new DefaultTestExecutionResult(testDirectory)
+        switch(type) {
+            case 'includeCategories':
+                result.assertNoTestClassesExecuted() // org.gradle.SomeTestClass is not marked CategoryA
+                break
+            case 'excludeCategories':
+                result.assertTestClassesExecuted('org.gradle.SomeTestClass')
+                break
+        }
+
         when:
         resources.maybeCopy("JUnitCategoriesIntegrationSpec/reExecutesWhenPropertyIsChanged")
-        buildFile << "test.useJUnit()"
 
         and:
         succeeds ':test'
+        result = new DefaultTestExecutionResult(testDirectory)
 
         then:
         executedAndNotSkipped ':test'
+        result.assertTestClassesExecuted('org.gradle.SomeTestClass')
 
         where:
         type << ['includeCategories', 'excludeCategories']
