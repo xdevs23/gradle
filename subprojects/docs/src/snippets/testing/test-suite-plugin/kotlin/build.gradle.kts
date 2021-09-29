@@ -28,19 +28,18 @@ repositories {
     mavenCentral()
 }
 
-// tag::configure-testing-extension[]
 testing {
-    suites { // <1>
-        val test by getting(JvmTestSuite::class) { // <2>
-            useJUnitJupiter() // <3>
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
         }
 
-        val integrationTest by registering(JvmTestSuite::class) { // <4>
+        val integrationTest by registering(JvmTestSuite::class) {
             dependencies {
-                implementation(project) // <5>
+                implementation(project)
             }
 
-            targets { // <6>
+            targets {
                 all {
                     testTask.configure {
                         shouldRunAfter(test)
@@ -51,7 +50,6 @@ testing {
     }
 }
 
-tasks.named("check") { // <7>
+tasks.named("check") {
     dependsOn(testing.suites.named("integrationTest"))
 }
-// end::configure-testing-extension[]
