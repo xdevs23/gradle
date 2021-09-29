@@ -29,29 +29,54 @@ repositories {
 }
 
 // tag::configure-testing-extension[]
-testing {
-    suites { // <1>
-        test { // <2>
-            useJUnitJupiter() // <3>
-        }
+    testing {
+        suites {
+            integrationTest(JvmTestSuite) {
+                dependencies {
+                    implementation project
+                }
 
-        integrationTest(JvmTestSuite) { // <4>
-            dependencies {
-                implementation project // <5>
-            }
-
-            targets { // <6>
-                all {
-                    testTask.configure {
-                        shouldRunAfter(test)
+                targets {
+                    all {
+                        testTask.configure {
+                            shouldRunAfter(test)
+                        }
                     }
                 }
             }
         }
     }
-}
 
-tasks.named('check') { // <7>
-    dependsOn(testing.suites.integrationTest)
-}
-// end::configure-testing-extension[]
+    tasks.named('check') {
+        dependsOn(testing.suites.integrationTest)
+    }
+
+    // end::configure-testing-extension[]
+
+
+    def integrationTest = sourceSets.create('integrationTest')
+
+    configurations.getByName(integrationTest.implementationConfigurationName).extendsFrom(configurations.testImplementation)
+    configurations.getByName(integrationTest.runtimeOnlyConfigurationName).extendsFrom(configurations.testRuntimeOnly)
+
+    def integrationTestTask = tasks.register('integrationTest', Test) {
+        description = 'Runs integration tests.'
+        group = 'verification'
+        useJUnitPlatform()
+
+        classpath = configurations.getByName(integrationTest.runtimeClasspathConfigurationName) + integrationTest.output
+        testClassesDirs = integrationTest.output.classesDirs
+
+        shouldRunAfter(tasks.named('test'))
+    }
+
+    tasks.named('check') {
+        dependsOn(integrationTestTask)
+    }
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+        integrationTestImplementation project
+    }
