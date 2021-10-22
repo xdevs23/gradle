@@ -18,6 +18,8 @@ package org.gradle.internal.fingerprint;
 
 import com.google.common.collect.ImmutableList;
 import org.gradle.internal.hash.Hasher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -38,11 +40,13 @@ public enum FingerprintHashingStrategy {
             appendCollectionToHasherKeepingOrder(hasher, fingerprints);
         }
     };
+    private static final Logger LOGGER = LoggerFactory.getLogger(FingerprintHashingStrategy.class);
 
     public abstract void appendToHasher(Hasher hasher, Collection<FileSystemLocationFingerprint> fingerprints);
 
     protected void appendCollectionToHasherKeepingOrder(Hasher hasher, Collection<FileSystemLocationFingerprint> fingerprints) {
         for (FileSystemLocationFingerprint fingerprint : fingerprints) {
+            LOGGER.error("FRANCOIS HOHOHO fingerprinting [" + fingerprint + "]");
             fingerprint.appendToHasher(hasher);
         }
     }
