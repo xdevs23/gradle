@@ -87,6 +87,15 @@ dependencies {
     testImplementation(libs.mockitoKotlin2)
     testImplementation(libs.kotlinCoroutinesDebug)
 
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+
+    testImplementation("org.testcontainers:testcontainers:1.16.0")
+    testImplementation("org.testcontainers:selenium:1.16.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.16.0")
+    testImplementation("org.seleniumhq.selenium:selenium-api:3.141.59")
+    testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
+
     integTestImplementation(project(":enterprise-operations"))
     integTestImplementation(project(":jvm-services"))
     integTestImplementation(project(":tooling-api"))
