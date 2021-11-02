@@ -19,6 +19,7 @@ package org.gradle.integtests.resolve.api
 import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
 import org.gradle.integtests.fixtures.extensions.FluidDependenciesResolveInterceptor
 import org.gradle.integtests.fixtures.extensions.FluidDependenciesResolveTest
+import spock.lang.IgnoreRest
 
 @FluidDependenciesResolveTest
 class ArtifactCollectionResultProviderIntegrationTest extends AbstractHttpDependencyResolutionTest {
@@ -53,6 +54,15 @@ class ArtifactCollectionResultProviderIntegrationTest extends AbstractHttpDepend
 
                 @InputFiles
                 abstract SetProperty<ResolvedArtifactResult> getResolvedArtifacts()
+
+                @OutputFile
+                abstract RegularFileProperty getOutputFile()
+            }
+
+            abstract class TaskWithCapabilityInput extends DefaultTask {
+
+                @Input
+                abstract Property<Capability> getCapability()
 
                 @OutputFile
                 abstract RegularFileProperty getOutputFile()
@@ -142,6 +152,38 @@ class ArtifactCollectionResultProviderIntegrationTest extends AbstractHttpDepend
         failure.assertHasCause("Could not find org:does-not-exist:1.0.")
     }
 
+    @IgnoreRest
+    def "task is not up-to-date when artifact capability changes"() {
+        given:
+        buildFile << """
+            tasks.register("verify", TaskWithCapabilityInput) {
+                capability.set(new org.gradle.internal.component.external.model.ImmutableCapability("g", "a", System.getProperty("v")))
+                // capability.set(Attribute.of("foo", String))
+                outputFile.set(layout.buildDirectory.file('output.txt'))
+                doLast {
+                    println(capability.get())
+                }
+            }
+        """
+
+        when:
+        succeeds("verify", "-Dv=1")
+
+        then:
+        executedAndNotSkipped ":verify"
+
+        when:
+        succeeds("verify", "-Dv=1")
+
+        then:
+        skipped ":verify"
+
+        when:
+        succeeds("verify", "-Dv=2")
+
+        then:
+        executedAndNotSkipped ":verify"
+    }
 
     def "task is not up-to-date when artifacts input changes"() {
         given:

@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":files"))
     implementation(project(":native"))
     implementation(project(":resources"))
+    implementation(project(":dependency-management"))
 
     implementation(libs.slf4jApi)
     implementation(libs.guava)

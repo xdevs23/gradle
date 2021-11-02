@@ -46,6 +46,7 @@ public class SnapshotSerializer extends AbstractSerializer<ValueSnapshot> {
     private static final int IMPLEMENTATION_SNAPSHOT = 17;
     private static final int HASH_SNAPSHOT = 18;
     private static final int DEFAULT_SNAPSHOT = 19;
+    private static final int CAPABILITY_SNAPSHOT = 20;
 
     private final HashCodeSerializer serializer = new HashCodeSerializer();
     private final Serializer<ImplementationSnapshot> implementationSnapshotSerializer = new ImplementationSnapshotSerializer();
@@ -114,6 +115,9 @@ public class SnapshotSerializer extends AbstractSerializer<ValueSnapshot> {
                 return implementationSnapshotSerializer.read(decoder);
             case DEFAULT_SNAPSHOT:
                 return new SerializedValueSnapshot(decoder.readBoolean() ? serializer.read(decoder) : null, decoder.readBinary());
+            case CAPABILITY_SNAPSHOT:
+                // return new CapabilityDefinitionSnapshot(new ImmutableCapability());
+                throw new IllegalArgumentException("TODO CAPABILITY");
             default:
                 throw new IllegalArgumentException("Don't know how to deserialize a snapshot with type tag " + type);
         }
@@ -225,6 +229,12 @@ public class SnapshotSerializer extends AbstractSerializer<ValueSnapshot> {
             ManagedValueSnapshot managedTypeSnapshot = (ManagedValueSnapshot) snapshot;
             encoder.writeString(managedTypeSnapshot.getClassName());
             write(encoder, managedTypeSnapshot.getState());
+        } else if (snapshot instanceof CapabilityDefinitionSnapshot) {
+            encoder.writeSmallInt(CAPABILITY_SNAPSHOT);
+            CapabilityDefinitionSnapshot capabilitySnapshot = (CapabilityDefinitionSnapshot) snapshot;
+            encoder.writeString(capabilitySnapshot.getValue().getGroup());
+            encoder.writeString(capabilitySnapshot.getValue().getName());
+            encoder.writeNullableString(capabilitySnapshot.getValue().getVersion());
         } else {
             throw new IllegalArgumentException("Don't know how to serialize a value of type " + snapshot.getClass().getSimpleName());
         }

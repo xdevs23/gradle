@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.gradle.api.attributes.Attribute;
 import org.gradle.internal.Cast;
+import org.gradle.internal.component.external.model.ImmutableCapability;
 import org.gradle.internal.hash.ClassLoaderHierarchyHasher;
 import org.gradle.internal.hash.HashCode;
 import org.gradle.internal.isolation.Isolatable;
@@ -32,6 +33,7 @@ import org.gradle.internal.serialize.Serializer;
 import org.gradle.internal.snapshot.impl.AbstractIsolatedMap;
 import org.gradle.internal.snapshot.impl.AttributeDefinitionSnapshot;
 import org.gradle.internal.snapshot.impl.BooleanValueSnapshot;
+import org.gradle.internal.snapshot.impl.CapabilityDefinitionSnapshot;
 import org.gradle.internal.snapshot.impl.FileValueSnapshot;
 import org.gradle.internal.snapshot.impl.IntegerValueSnapshot;
 import org.gradle.internal.snapshot.impl.IsolatedArray;
@@ -77,6 +79,7 @@ public class IsolatableSerializerRegistry extends DefaultSerializerRegistry {
     private static final byte ISOLATED_LIST = (byte) 14;
     private static final byte ISOLATED_SET = (byte) 15;
     private static final byte ISOLATED_PROPERTIES = (byte) 16;
+    private static final byte CAPABILITY_VALUE = (byte) 17;
 
     private static final byte ISOLATABLE_TYPE = (byte) 0;
     private static final byte ARRAY_TYPE = (byte) 1;
@@ -109,6 +112,7 @@ public class IsolatableSerializerRegistry extends DefaultSerializerRegistry {
         isolatableSerializers.put(ISOLATED_LIST, new IsolatedListSerializer());
         isolatableSerializers.put(ISOLATED_SET, new IsolatedSetSerializer());
         isolatableSerializers.put(ISOLATED_PROPERTIES, new IsolatedPropertiesSerializer());
+        isolatableSerializers.put(CAPABILITY_VALUE, new CapabilityDefinitionSnapshotSerializer());
 
         for (IsolatableSerializer<?> serializer : isolatableSerializers.values()) {
             register(serializer.getIsolatableClass(), Cast.uncheckedCast(serializer));
@@ -306,6 +310,30 @@ public class IsolatableSerializerRegistry extends DefaultSerializerRegistry {
         @Override
         public Class<AttributeDefinitionSnapshot> getIsolatableClass() {
             return AttributeDefinitionSnapshot.class;
+        }
+    }
+
+    private class CapabilityDefinitionSnapshotSerializer implements IsolatableSerializer<CapabilityDefinitionSnapshot> {
+
+        @Override
+        public CapabilityDefinitionSnapshot read(Decoder decoder) throws Exception {
+            String group = decoder.readString();
+            String name = decoder.readString();
+            String version = decoder.readNullableString();
+            return new CapabilityDefinitionSnapshot(new ImmutableCapability(group, name, version));
+        }
+
+        @Override
+        public void write(Encoder encoder, CapabilityDefinitionSnapshot value) throws Exception {
+            encoder.writeByte(CAPABILITY_VALUE);
+            encoder.writeString(value.getValue().getGroup());
+            encoder.writeString(value.getValue().getName());
+            encoder.writeNullableString(value.getValue().getVersion());
+        }
+
+        @Override
+        public Class<CapabilityDefinitionSnapshot> getIsolatableClass() {
+            return CapabilityDefinitionSnapshot.class;
         }
     }
 

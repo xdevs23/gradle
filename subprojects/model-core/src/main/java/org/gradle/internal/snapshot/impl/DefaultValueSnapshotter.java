@@ -19,6 +19,7 @@ package org.gradle.internal.snapshot.impl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.gradle.api.attributes.Attribute;
+import org.gradle.api.capabilities.Capability;
 import org.gradle.internal.hash.ClassLoaderHierarchyHasher;
 import org.gradle.internal.hash.HashCode;
 import org.gradle.internal.isolation.Isolatable;
@@ -147,6 +148,9 @@ public class DefaultValueSnapshotter implements ValueSnapshotter, IsolatableFact
         if (value instanceof Attribute) {
             return visitor.attributeValue((Attribute<?>) value);
         }
+        if (value instanceof Capability) {
+            return visitor.capabilityValue((Capability) value);
+        }
         if (value instanceof Managed) {
             Managed managed = (Managed) value;
             if (managed.isImmutable()) {
@@ -207,6 +211,8 @@ public class DefaultValueSnapshotter implements ValueSnapshotter, IsolatableFact
         T hashCode(HashCode value);
 
         T attributeValue(Attribute<?> value);
+
+        T capabilityValue(Capability value);
 
         T managedValue(Managed value, T state);
 
@@ -291,6 +297,11 @@ public class DefaultValueSnapshotter implements ValueSnapshotter, IsolatableFact
         @Override
         public ValueSnapshot attributeValue(Attribute<?> value) {
             return new AttributeDefinitionSnapshot(value, classLoaderHasher);
+        }
+
+        @Override
+        public ValueSnapshot capabilityValue(Capability value) {
+            return new CapabilityDefinitionSnapshot(value);
         }
 
         @Override
@@ -411,6 +422,11 @@ public class DefaultValueSnapshotter implements ValueSnapshotter, IsolatableFact
         @Override
         public Isolatable<?> attributeValue(Attribute<?> value) {
             return new AttributeDefinitionSnapshot(value, classLoaderHasher);
+        }
+
+        @Override
+        public Isolatable<?> capabilityValue(Capability value) {
+            return new CapabilityDefinitionSnapshot(value);
         }
 
         @Override
