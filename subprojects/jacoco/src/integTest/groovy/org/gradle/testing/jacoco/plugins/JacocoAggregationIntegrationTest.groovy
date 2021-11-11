@@ -340,11 +340,11 @@ class JacocoAggregationIntegrationTest extends AbstractIntegrationSpec {
                 }
             """
         when:
-        fails(":application:testCodeCoverageReport", "application:outgoingVariants", ":application:dependencies", ":transitive:outgoingVariants")
+        fails(":application:testCodeCoverageReport", "application:outgoingVariants", ":application:dependencies", ":transitive:outgoingVariants", "--continue")
 
         then:
         file("direct/build/jacoco/test.exec").assertExists()
-        //file("transitive/build/jacoco/test.exec").assertExists() // FIXME expected failure; as the verification failure in :direct:test causes :transitive:test to be pruned from the execution graph
+        file("transitive/build/jacoco/test.exec").assertExists() // FIXME expected failure; as the verification failure in :direct:test causes :transitive:test to be pruned from the execution graph
         file("application/build/jacoco/test.exec").assertExists()
 
         // TODO make :application:testCodeCoverageReport execute even though :direct:test contains a verification failure
