@@ -17,6 +17,7 @@
 package org.gradle.testing.jacoco.plugins;
 
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.provider.Property;
 import org.gradle.api.reporting.ReportSpec;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.testing.jacoco.tasks.JacocoReport;
@@ -27,4 +28,7 @@ public interface JacocoCoverageReport extends ReportSpec {
     ConfigurableFileCollection getExecutionData();
 
     TaskProvider<JacocoReport> getReportTask();
+
+//    Property<String> getTestType();
+    default String getTestType() { return "test";};
 }

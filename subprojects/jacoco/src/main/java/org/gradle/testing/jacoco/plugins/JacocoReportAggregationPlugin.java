@@ -76,10 +76,14 @@ public abstract class JacocoReportAggregationPlugin implements Plugin<Project> {
 
         // TODO check task dependency
 
+        // configure user-specified reports
         reporting.getReports().withType(JacocoCoverageReport.class).configureEach(report -> {
             report.getClasses().from(analyzedClasses.getFiles());
             report.getSources().from(sourcesPath.getFiles());
+            // TODO wire TestType; it's the only public API; other methods can be concealed
         });
+
+        // convention for synthesizing reports based on existing test suites in "this" project
         project.getPlugins().withId("jvm-test-suite", p -> {
             // Depend on this project for aggregation
             project.getDependencies().add(JACOCO_AGGREGATION_CONFIGURATION_NAME, project);
@@ -108,7 +112,7 @@ public abstract class JacocoReportAggregationPlugin implements Plugin<Project> {
                 attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.class, Usage.JAVA_RUNTIME));
                 attributes.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.class, Category.DOCUMENTATION));
                 attributes.attribute(DocsType.DOCS_TYPE_ATTRIBUTE, objects.named(DocsType.class, "jacoco-coverage-data"));
-                // TODO: need to support provider
+                // TODO: need to support provider with TestType value
                 attributes.attribute(TestSuiteType.TEST_SUITE_TYPE_ATTRIBUTE, objects.named(TestSuiteType.class, name));
             });
         });
