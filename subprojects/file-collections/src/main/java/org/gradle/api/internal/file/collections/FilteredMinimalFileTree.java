@@ -74,12 +74,7 @@ public class FilteredMinimalFileTree implements MinimalFileTree, FileSystemMirro
 
             @Override
             public void visitCollection(FileCollectionInternal.Source source, Iterable<File> contents) {
-                visitor.visitGenericFileTree(owner, FilteredMinimalFileTree.this);
-            }
-
-            @Override
-            public void visitGenericFileTree(FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
-                visitor.visitGenericFileTree(owner, FilteredMinimalFileTree.this);
+                visitor.visitCollection(source, contents);
             }
 
             @Override

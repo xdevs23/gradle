@@ -271,10 +271,6 @@ class TestTest extends AbstractConventionTaskTest {
                 throw new IllegalArgumentException()
             }
 
-            @Override
-            void visitGenericFileTree(FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
-                throw new IllegalArgumentException()
-            }
 
             @Override
             void visitFileTree(File root, PatternSet patterns, FileTreeInternal fileTree) {

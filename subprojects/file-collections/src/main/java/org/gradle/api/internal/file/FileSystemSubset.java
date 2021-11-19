@@ -126,11 +126,6 @@ public class FileSystemSubset {
         }
 
         @Override
-        public void visitGenericFileTree(FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
-            addFiles(fileTree);
-        }
-
-        @Override
         public void visitFileTree(File root, PatternSet patterns, FileTreeInternal fileTree) {
             lock.lock();
             try {

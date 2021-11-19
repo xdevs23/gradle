@@ -141,11 +141,6 @@ public abstract class AbstractFileCollection implements FileCollectionInternal {
             }
 
             @Override
-            public void visitGenericFileTree(FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
-                addTreeContents(fileTree);
-            }
-
-            @Override
             public void visitFileTree(File root, PatternSet patterns, FileTreeInternal fileTree) {
                 addTreeContents(fileTree);
             }
@@ -259,16 +254,11 @@ public abstract class AbstractFileCollection implements FileCollectionInternal {
             }
 
             @Override
-            public void visitGenericFileTree(FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
+            public void visitFileTreeBackedByFile(File file, FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
                 // Visit the contents of the tree to generate the tree
                 if (visitAll(sourceTree)) {
                     fileTrees.add(sourceTree.getMirror());
                 }
-            }
-
-            @Override
-            public void visitFileTreeBackedByFile(File file, FileTreeInternal fileTree, FileSystemMirroringFileTree sourceTree) {
-                visitGenericFileTree(fileTree, sourceTree);
             }
         });
         return fileTrees;

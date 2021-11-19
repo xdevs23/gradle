@@ -309,8 +309,8 @@ public class VirtualFileSystemServices extends AbstractPluginServiceRegistry {
             return new DefaultGenericFileTreeSnapshotter(hasher, stringInterner);
         }
 
-        FileCollectionSnapshotter createFileCollectionSnapshotter(FileSystemAccess fileSystemAccess, GenericFileTreeSnapshotter genericFileTreeSnapshotter, Stat stat) {
-            return new DefaultFileCollectionSnapshotter(fileSystemAccess, genericFileTreeSnapshotter, stat);
+        FileCollectionSnapshotter createFileCollectionSnapshotter(FileSystemAccess fileSystemAccess, Stat stat) {
+            return new DefaultFileCollectionSnapshotter(fileSystemAccess, stat);
         }
 
         ResourceSnapshotterCacheService createResourceSnapshotterCacheService(CrossBuildFileHashCache store) {
@@ -380,8 +380,8 @@ public class VirtualFileSystemServices extends AbstractPluginServiceRegistry {
             return new DefaultGenericFileTreeSnapshotter(hasher, stringInterner);
         }
 
-        FileCollectionSnapshotter createFileCollectionSnapshotter(FileSystemAccess fileSystemAccess, GenericFileTreeSnapshotter genericFileTreeSnapshotter, Stat stat) {
-            return new DefaultFileCollectionSnapshotter(fileSystemAccess, genericFileTreeSnapshotter, stat);
+        FileCollectionSnapshotter createFileCollectionSnapshotter(FileSystemAccess fileSystemAccess, Stat stat) {
+            return new DefaultFileCollectionSnapshotter(fileSystemAccess, stat);
         }
 
         OutputSnapshotter createOutputSnapshotter(FileCollectionSnapshotter fileCollectionSnapshotter) {
