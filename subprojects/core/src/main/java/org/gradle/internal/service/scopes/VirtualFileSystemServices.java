@@ -289,7 +289,7 @@ public class VirtualFileSystemServices extends AbstractPluginServiceRegistry {
             WatchableFileSystemDetector watchableFileSystemDetector,
             Predicate<String> watchFilter
         ) {
-            if (nativeCapabilities.useFileSystemWatching()) {
+            if (false && nativeCapabilities.useFileSystemWatching()) {
                 try {
                     if (operatingSystem.isMacOsX()) {
                         return Optional.of(new DarwinFileWatcherRegistryFactory(watchableFileSystemDetector, watchFilter));
