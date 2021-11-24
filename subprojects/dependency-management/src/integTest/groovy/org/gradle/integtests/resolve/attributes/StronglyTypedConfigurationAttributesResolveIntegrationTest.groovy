@@ -356,10 +356,10 @@ class StronglyTypedConfigurationAttributesResolveIntegrationTest extends Abstrac
                         attributes { $debug; attribute(flavor, objects.named(Flavor, "TWO")) }
                     }
                     foo2 {
-                        attributes { $debug; attribute(flavor, objects.named(Flavor, "ONE")) }
+                        attributes { $debug; attribute(flavor, objects.named(Flavor, "ONE")); attribute(extra, 'ex1') }
                     }
                     foo3 {
-                        attributes { $debug; attribute(flavor, objects.named(Flavor, "ONE")) }
+                        attributes { $debug; attribute(flavor, objects.named(Flavor, "ONE")); attribute(extra, 'ex2') }
                     }
                     bar {
                         attributes { $release; attribute(flavor, objects.named(Flavor, "ONE")) }
