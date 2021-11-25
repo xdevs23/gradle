@@ -4,3 +4,9 @@ plugins {
 }
 
 description = "Configuration cache problems HTML report"
+
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink>().configureEach {
+    doFirst {
+        println("filteredArgumentsMap: $filteredArgumentsMap")
+    }
+}
