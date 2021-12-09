@@ -88,7 +88,7 @@ fun BuildType.applyDefaultSettings(os: Os = Os.LINUX, buildJvm: Jvm = BuildToolB
     }
 
     vcs {
-        root(AbsoluteId("Gradle_Branches_GradlePersonalBranches"))
+        root(AbsoluteId("GradleBuildToolBranches"))
         checkoutMode = CheckoutMode.ON_AGENT
         branchFilter = branchesFilterExcluding()
     }
