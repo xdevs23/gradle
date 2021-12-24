@@ -19,4 +19,5 @@ import java.util.Set;
 
 public interface ConfigurationsProvider {
     Set<? extends ConfigurationInternal> getAll();
+    void lock();
 }

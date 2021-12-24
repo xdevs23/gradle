@@ -102,6 +102,7 @@ public class DefaultRootComponentMetadataBuilder implements RootComponentMetadat
 
     private DefaultLocalComponentMetadata getRootComponentMetadata(Module module, ComponentIdentifier componentIdentifier, ModuleVersionIdentifier moduleVersionIdentifier, AttributesSchemaInternal schema, DependencyLockingProvider dependencyLockingHandler) {
         DefaultLocalComponentMetadata metadata = new RootLocalComponentMetadata(moduleVersionIdentifier, componentIdentifier, module.getStatus(), schema, dependencyLockingHandler);
+        configurationsProvider.lock();
         for (ConfigurationInternal configuration : configurationsProvider.getAll()) {
             addConfiguration(metadata, configuration);
         }

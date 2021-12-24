@@ -23,6 +23,10 @@ class DetachedConfigurationsProvider implements ConfigurationsProvider {
     private ConfigurationInternal theOnlyConfiguration;
 
     @Override
+    public void lock() {
+    }
+
+    @Override
     public Set<ConfigurationInternal> getAll() {
         return ImmutableSet.of(theOnlyConfiguration);
     }
