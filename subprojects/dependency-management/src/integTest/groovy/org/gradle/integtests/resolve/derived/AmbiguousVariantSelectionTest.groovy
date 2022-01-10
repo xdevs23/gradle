@@ -85,7 +85,7 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
                     producerArtifacts {
                         attributes {
                             attribute(attrA, '1') // adjust these to select a different variant
-                            attribute(attrB, '2') // adjust these to select a different variant
+                            attribute(attrB, '1') // adjust these to select a different variant
                         }
                     }
                 }
