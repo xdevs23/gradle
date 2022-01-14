@@ -40,6 +40,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
+    compileOnly(project(":base-instrumentation"))
+
     implementation(project(":base-services"))
     implementation(project(":base-services-groovy"))
     implementation(project(":composite-builds"))

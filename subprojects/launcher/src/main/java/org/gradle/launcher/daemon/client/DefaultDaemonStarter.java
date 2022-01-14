@@ -103,6 +103,16 @@ public class DefaultDaemonStarter implements DaemonStarter {
         if (Boolean.getBoolean("org.gradle.daemon.debug")) {
             daemonArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
         }
+        String bootclasspath = System.getProperty("org.gradle.internal.bootclasspath");
+        if (bootclasspath != null) {
+            daemonArgs.add("-Xbootclasspath/a:" + bootclasspath);
+        }
+
+        String agentPath = System.getProperty("org.gradle.internal.agentpath");
+        if (agentPath != null) {
+            daemonArgs.add("-javaagent:" + agentPath);
+        }
+
         LOGGER.debug("Using daemon args: {}", daemonArgs);
 
         daemonArgs.add(GradleDaemon.class.getName());

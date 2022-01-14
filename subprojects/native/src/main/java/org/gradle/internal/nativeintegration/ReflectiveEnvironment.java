@@ -16,6 +16,7 @@
 
 package org.gradle.internal.nativeintegration;
 
+import org.gradle.internal.instrumented.Instrumented;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.lang.reflect.Field;
@@ -61,6 +62,7 @@ public class ReflectiveEnvironment {
     }
 
     private Map<String, String> getEnv() {
+        Instrumented.DisabledForThread disabler = Instrumented.withInstrumentationDisabled();
         try {
             Map<String, String> theUnmodifiableEnvironment = System.getenv();
             Class<?> cu = theUnmodifiableEnvironment.getClass();
@@ -71,6 +73,8 @@ public class ReflectiveEnvironment {
             return result;
         } catch (Exception e) {
             throw new NativeIntegrationException("Unable to get mutable environment map", e);
+        } finally {
+            disabler.close();
         }
     }
 }

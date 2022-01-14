@@ -32,6 +32,33 @@ val manifestClasspath by configurations.creating {
     }
 }
 
+val bootclasspathExtras by configurations.creating {
+    isCanBeResolved = false
+    isCanBeConsumed = false
+}
+
+val bootclasspathExtrasClasspath by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+
+    extendsFrom(bootclasspathExtras)
+}
+
+val agents by configurations.creating {
+    isCanBeResolved = false
+    isCanBeConsumed = false
+}
+
+val agentsClasspath by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+
+    extendsFrom(agents)
+    attributes {
+        attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.SHADOWED))
+    }
+}
+
 tasks.jar.configure {
     val classpath = manifestClasspath.elements.map { classpathDependency ->
         classpathDependency.joinToString(" ") {
@@ -46,6 +73,9 @@ tasks.jar.configure {
 val startScripts = tasks.register<GradleStartScriptGenerator>("startScripts") {
     startScriptsDir.set(layout.buildDirectory.dir("startScripts"))
     launcherJar.from(tasks.jar)
+    bootclasspathJars.from(bootclasspathExtrasClasspath)
+    agentJars.from(agentsClasspath)
+    dependsOn(bootclasspathExtrasClasspath, agentsClasspath)
 }
 
 configurations {

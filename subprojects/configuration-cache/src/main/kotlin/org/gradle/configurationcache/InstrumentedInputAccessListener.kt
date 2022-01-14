@@ -18,8 +18,8 @@ package org.gradle.configurationcache
 
 import org.gradle.configurationcache.initialization.ConfigurationCacheProblemsListener
 import org.gradle.configurationcache.serialization.Workarounds
-import org.gradle.internal.classpath.Instrumented
 import org.gradle.internal.event.ListenerManager
+import org.gradle.internal.instrumented.Instrumented
 import org.gradle.internal.service.scopes.Scopes
 import org.gradle.internal.service.scopes.ServiceScope
 import java.io.File
@@ -72,29 +72,29 @@ class InstrumentedInputAccessListener(
     private
     val externalProcessListener = configurationCacheProblemsListener
 
-    override fun systemPropertyQueried(key: String, value: Any?, consumer: String) {
-        if (allowedProperties.contains(key) || Workarounds.canReadSystemProperty(consumer)) {
+    override fun systemPropertyQueried(key: String, value: Any?, consumer: String?) {
+        if (allowedProperties.contains(key) || (consumer != null && Workarounds.canReadSystemProperty(consumer))) {
             return
         }
         broadcast.systemPropertyRead(key, value, consumer)
     }
 
-    override fun envVariableQueried(key: String, value: String?, consumer: String) {
-        if (Workarounds.canReadEnvironmentVariable(consumer)) {
+    override fun envVariableQueried(key: String, value: String?, consumer: String?) {
+        if (consumer != null && Workarounds.canReadEnvironmentVariable(consumer)) {
             return
         }
         broadcast.envVariableRead(key, value, consumer)
     }
 
-    override fun externalProcessStarted(command: String, consumer: String) {
-        if (Workarounds.canStartExternalProcesses(consumer)) {
+    override fun externalProcessStarted(command: String, consumer: String?) {
+        if (consumer != null && Workarounds.canStartExternalProcesses(consumer)) {
             return
         }
         externalProcessListener.onExternalProcessStarted(command, consumer)
     }
 
-    override fun fileOpened(file: File, consumer: String) {
-        if (Workarounds.canReadFiles(consumer)) {
+    override fun fileOpened(file: File, consumer: String?) {
+        if (consumer != null && Workarounds.canReadFiles(consumer)) {
             return
         }
         broadcast.fileOpened(file, consumer)

@@ -26,6 +26,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
 
 @CacheableTask
@@ -41,6 +42,20 @@ abstract class GradleStartScriptGenerator : DefaultTask() {
     @get:OutputDirectory
     abstract val startScriptsDir: DirectoryProperty
 
+    @get:Internal
+    abstract val agentJars: ConfigurableFileCollection
+
+    @get:Input
+    val agentJarPaths: Collection<File>
+        get() = agentJars.files
+
+    @get:Internal
+    abstract val bootclasspathJars: ConfigurableFileCollection
+
+    @get:Input
+    val bootclasspathJarPaths: Collection<File>
+        get() = bootclasspathJars.files
+
     @TaskAction
     fun generate() {
         logging.captureStandardOutput(LogLevel.INFO)
@@ -52,7 +67,9 @@ abstract class GradleStartScriptGenerator : DefaultTask() {
         generator.setScriptRelPath("bin/gradle")
         generator.setClasspath(listOf("lib/$launcherJarName"))
         generator.setAppNameSystemProperty("org.gradle.appname")
-        generator.setDefaultJvmOpts(listOf("-Xmx64m", "-Xms64m"))
+        generator.setDefaultJvmOpts(
+            listOf("-Xmx64m", "-Xms64m", "-Dorg.gradle.internal.bootclasspath=${bootclasspathJars.singleFile}",
+                "-Dorg.gradle.internal.agentpath=${agentJars.singleFile}"))
         generator.generateUnixScript(startScriptsDir.file("gradle").get().asFile)
         generator.generateWindowsScript(startScriptsDir.file("gradle.bat").get().asFile)
     }

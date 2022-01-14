@@ -24,6 +24,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -89,7 +90,8 @@ abstract class ShadedJar : DefaultTask() {
             if (!manifests.isEmpty) {
                 jarOutputStream.addJarEntry(JarFile.MANIFEST_NAME, manifests.first())
             }
-            jarOutputStream.addJarEntry(BuildReceipt.buildReceiptLocation, buildReceiptFile.singleFile)
+            if (!buildReceiptFile.isEmpty)
+                jarOutputStream.addJarEntry(BuildReceipt.buildReceiptLocation, buildReceiptFile.singleFile)
             relocatedClassesConfiguration.files.forEach { classesDir ->
                 val classesDirPath = classesDir.toPath()
                 classesDir.walk().filter {

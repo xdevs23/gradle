@@ -39,10 +39,10 @@ import org.gradle.internal.Factory
 import org.gradle.internal.build.BuildStateRegistry
 import org.gradle.internal.buildtree.BuildActionModelRequirements
 import org.gradle.internal.buildtree.BuildTreeWorkGraph
-import org.gradle.internal.classpath.Instrumented
 import org.gradle.internal.component.local.model.LocalComponentMetadata
 import org.gradle.internal.concurrent.CompositeStoppable
 import org.gradle.internal.concurrent.Stoppable
+import org.gradle.internal.instrumented.Instrumented
 import org.gradle.internal.operations.BuildOperationExecutor
 import org.gradle.internal.vfs.FileSystemAccess
 import org.gradle.internal.watch.vfs.BuildLifecycleAwareVirtualFileSystem

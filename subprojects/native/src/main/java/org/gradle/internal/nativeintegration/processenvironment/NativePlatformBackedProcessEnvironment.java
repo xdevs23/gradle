@@ -16,6 +16,7 @@
 package org.gradle.internal.nativeintegration.processenvironment;
 
 import net.rubygrapefruit.platform.Process;
+import org.gradle.internal.instrumented.Instrumented;
 
 import java.io.File;
 
@@ -28,12 +29,22 @@ public class NativePlatformBackedProcessEnvironment extends AbstractProcessEnvir
 
     @Override
     protected void removeNativeEnvironmentVariable(String name) {
-        process.setEnvironmentVariable(name, null);
+        Instrumented.DisabledForThread disabler = Instrumented.withInstrumentationDisabled();
+        try {
+            process.setEnvironmentVariable(name, null);
+        } finally {
+            disabler.close();
+        }
     }
 
     @Override
     protected void setNativeEnvironmentVariable(String name, String value) {
-        process.setEnvironmentVariable(name, value);
+        Instrumented.DisabledForThread disabler = Instrumented.withInstrumentationDisabled();
+        try {
+            process.setEnvironmentVariable(name, value);
+        } finally {
+            disabler.close();
+        }
     }
 
     @Override

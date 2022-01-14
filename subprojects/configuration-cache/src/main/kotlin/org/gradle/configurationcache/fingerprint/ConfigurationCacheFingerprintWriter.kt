@@ -59,6 +59,7 @@ import org.gradle.groovy.scripts.ScriptSource
 import org.gradle.internal.concurrent.CompositeStoppable
 import org.gradle.internal.execution.TaskExecutionTracker
 import org.gradle.internal.hash.HashCode
+import org.gradle.internal.instrumented.Instrumented
 import org.gradle.internal.resource.local.FileResourceListener
 import org.gradle.internal.scripts.ScriptExecutionListener
 import org.gradle.util.Path
@@ -261,7 +262,9 @@ class ConfigurationCacheFingerprintWriter(
 
     private
     fun captureFile(file: File) {
-        sink().captureFile(file)
+        Instrumented.withInstrumentationDisabled().use {
+            sink().captureFile(file)
+        }
     }
 
     private

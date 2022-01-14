@@ -45,6 +45,9 @@ dependencies {
     manifestClasspath(project(":core"))
     manifestClasspath(project(":persistent-cache"))
 
+    agents(project(":instrumentation-agent"))
+    bootclasspathExtras(project(":base-instrumentation"))
+
     testImplementation(project(":internal-integ-testing"))
     testImplementation(project(":native"))
     testImplementation(project(":cli"))

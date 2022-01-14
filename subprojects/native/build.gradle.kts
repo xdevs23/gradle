@@ -8,6 +8,8 @@ description = "This project contains various native operating system integration
 gradlebuildJava.usedInWorkers()
 
 dependencies {
+    compileOnly(project(":base-instrumentation"))
+
     api(project(":files"))
 
     implementation(project(":base-services"))
