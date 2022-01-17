@@ -33,7 +33,7 @@ dependencyResolutionManagement {
         }
         maven {
             name = "Gradle public repository"
-            url = uri("https://repo.gradle.org/gradle/public")
+            url = uri("https://repo.gradle.org/gradle/repo")
             content {
                 includeModule("classycle", "classycle")
             }

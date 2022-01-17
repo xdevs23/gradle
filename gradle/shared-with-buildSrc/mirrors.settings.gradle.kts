@@ -24,7 +24,7 @@ val originalUrls: Map<String, String> = mapOf(
     "gradle" to "https://repo.gradle.org/gradle/repo",
     "gradleplugins" to "https://plugins.gradle.org/m2",
     "gradlejavascript" to "https://repo.gradle.org/gradle/javascript-public",
-    "gradle-public" to "https://repo.gradle.org/gradle/public",
+    "gradle-public" to "https://repo.gradle.org/gradle/repo",
     "gradle-enterprise-plugin-rc" to "https://repo.gradle.org/gradle/enterprise-libs-release-candidates"
 )
 

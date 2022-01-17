@@ -17,7 +17,7 @@
 repositories {
     maven {
         name = "Gradle public repository"
-        url = uri("https://repo.gradle.org/gradle/public")
+        url = uri("https://repo.gradle.org/gradle/repo")
         content {
             includeGroup("net.rubygrapefruit")
             includeModule("classycle", "classycle")
