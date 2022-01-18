@@ -24,11 +24,14 @@ import org.gradle.cache.FileLock
 import org.gradle.cache.FileLockManager
 import org.gradle.cache.LockOptions
 import org.gradle.initialization.GradleUserHomeDirProvider
+import org.gradle.internal.os.OperatingSystem
 import org.gradle.util.internal.Resources
 import org.junit.Rule
 import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.TempDir
+
+import static org.junit.Assume.assumeTrue
 
 class JdkCacheDirectoryTest extends Specification {
 
@@ -49,20 +52,42 @@ class JdkCacheDirectoryTest extends Specification {
         homes.isEmpty()
     }
 
+    def "list java homes on MacOs"() {
+        assumeTrue(OperatingSystem.current().isMacOsX())
+
+        given:
+        def jdkCacheDirectory = new JdkCacheDirectory(newHomeDirProvider(), Mock(FileOperations), mockLockManager())
+
+        def install1 = new File(temporaryFolder, "jdks/jdk-mac/Contents/Home").tap { mkdirs() }
+        new File(temporaryFolder, "jdks/jdk-mac/provisioned.ok").createNewFile()
+
+        def install2 = new File(temporaryFolder, "jdks/jdk-mac-2/some-jdk-folder/Contents/Home").tap { mkdirs() }
+        new File(temporaryFolder, "jdks/jdk-mac-2/provisioned.ok").createNewFile()
+
+        new File(temporaryFolder, "jdks/notReady").tap { mkdirs() }
+
+        when:
+        def homes = jdkCacheDirectory.listJavaHomes()
+
+        then:
+        homes.containsAll([install1, install2])
+    }
+
     def "lists jdk directories when listing java homes"() {
         given:
         def jdkCacheDirectory = new JdkCacheDirectory(newHomeDirProvider(), Mock(FileOperations), mockLockManager())
-        def install1 = new File(temporaryFolder, "jdks/jdk-123").tap { mkdirs() }
+
+        def install1 = new File(temporaryFolder, "jdks/jdk-1").tap { mkdirs() }
         new File(install1, "provisioned.ok").createNewFile()
 
-        def install2 = new File(temporaryFolder, "jdks/jdk-345").tap { mkdirs() }
+        def install2 = new File(temporaryFolder, "jdks/jdk-2").tap { mkdirs() }
         new File(install2, "provisioned.ok").createNewFile()
 
-        def install3 = new File(temporaryFolder, "jdks/jdk-mac/Contents/Home").tap { mkdirs() }
-        new File(temporaryFolder, "jdks/jdk-mac/provisioned.ok").createNewFile()
+        def install3 = new File(temporaryFolder, "jdks/jdk-3/sub-folder").tap { mkdirs() }
+        new File(install3, "provisioned.ok").createNewFile()
 
-        def install4 = new File(temporaryFolder, "jdks/jdk-mac-2/some-jdk-folder/Contents/Home").tap { mkdirs() }
-        new File(temporaryFolder, "jdks/jdk-mac-2/provisioned.ok").createNewFile()
+        def install4 = new File(temporaryFolder, "jdks/jdk-3/sub-folder").tap { mkdirs() }
+        new File(install4, "provisioned.ok").createNewFile()
 
         new File(temporaryFolder, "jdks/notReady").tap { mkdirs() }
 
@@ -82,8 +107,11 @@ class JdkCacheDirectoryTest extends Specification {
 
         then:
         installedJdk.exists()
+        installedJdk.getParentFile().getParentFile().getName() == "jdks"
+        installedJdk.getParentFile().getName() == "jdk"
+        installedJdk.getName() == "jdk"
         new File(installedJdk, "provisioned.ok").exists()
-        new File(installedJdk, "jdk/file").exists()
+        new File(installedJdk, "file").exists()
     }
 
     def "provisions jdk from zip archive"() {
@@ -95,8 +123,11 @@ class JdkCacheDirectoryTest extends Specification {
 
         then:
         installedJdk.exists()
+        installedJdk.getParentFile().getParentFile().getName() == "jdks"
+        installedJdk.getParentFile().getName() == "jdk"
+        installedJdk.getName() == "jdk-123"
         new File(installedJdk, "provisioned.ok").exists()
-        new File(installedJdk, "jdk-123/file").exists()
+        new File(installedJdk, "file").exists()
     }
 
     @Ignore
