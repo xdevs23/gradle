@@ -271,6 +271,7 @@ public class AvailableToolChains {
             if (version.isAvailable()) {
                 File binDir = swiftc.getParentFile();
                 toolChains.add(new InstalledSwiftc(binDir, version.getComponent().getVersion()).inPath(binDir, new File("/usr/bin")));
+                System.out.println("Found swiftc in: " + swiftc);
             }
         }
 
@@ -285,6 +286,7 @@ public class AvailableToolChains {
                 InstalledSwiftc swiftc = new InstalledSwiftc(binDir, version.getComponent().getVersion());
                 swiftc.inPath(binDir, new File("/usr/bin"));
                 toolChains.add(swiftc);
+                System.out.println("Found swiftc in path: " + swiftc.binDir);
             }
         }
 
