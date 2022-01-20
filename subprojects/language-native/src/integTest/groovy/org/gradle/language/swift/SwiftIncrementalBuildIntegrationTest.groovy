@@ -193,6 +193,9 @@ class SwiftIncrementalBuildIntegrationTest extends AbstractInstalledToolChainInt
             outputs.recompiledClasses('greeter', 'renamed-sum')
         }
 
+        println("toolchain: ${toolChain.version} undertest: ${toolchainUnderTest.version}")
+        println(expectedIntermediateDescendants(lib.alternate))
+
         outputDirectory.assertContainsDescendants(expectedIntermediateDescendants(lib.alternate))
         sharedLibrary("build/lib/main/debug/Hello").assertExists()
     }
@@ -396,11 +399,11 @@ class SwiftIncrementalBuildIntegrationTest extends AbstractInstalledToolChainInt
         return result
     }
 
-    def swiftsourceinfoFileFor(File sourceFile, String intermediateFilesDir = "build/obj/main/debug") {
+    def swiftmoduleFileFor(File sourceFile, String intermediateFilesDir = "build/obj/main/debug") {
         return intermediateFileFor(sourceFile, intermediateFilesDir, "~partial.swiftmodule")
     }
 
-    def swiftmoduleFileFor(File sourceFile, String intermediateFilesDir = "build/obj/main/debug") {
+    def swiftsourceinfoFileFor(File sourceFile, String intermediateFilesDir = "build/obj/main/debug") {
         return intermediateFileFor(sourceFile, intermediateFilesDir, "~partial.swiftsourceinfo")
     }
 
