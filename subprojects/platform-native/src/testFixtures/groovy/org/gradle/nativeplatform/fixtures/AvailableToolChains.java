@@ -267,6 +267,7 @@ public class AvailableToolChains {
 
         for (File swiftInstall : swiftCandidates) {
             File swiftc = new File(swiftInstall, "/usr/bin/swiftc");
+            System.out.println("Candidate: " + swiftc);
             SearchResult<SwiftcMetadata> version = versionDeterminer.getCompilerMetaData(Collections.emptyList(), spec -> spec.executable(swiftc));
             if (version.isAvailable()) {
                 File binDir = swiftc.getParentFile();
