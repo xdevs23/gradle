@@ -375,7 +375,9 @@ class SwiftIncrementalBuildIntegrationTest extends AbstractInstalledToolChainInt
             result.add(swiftmoduleFileFor(swiftFile).relativizeFrom(intermediateFilesDir).path)
             result.add(swiftdocFileFor(swiftFile).relativizeFrom(intermediateFilesDir).path)
 
+            println("Current tool chain: ${toolChain.version}")
             if (toolChain.version >= VersionNumber.parse("5.3")) {
+                println("Current tool chain, add: ${toolChain.version}")
                 // Seems to be introduced by 5.3:
                 // https://github.com/bazelbuild/rules_swift/issues/496
                 result.add(swiftsourceinfoFileFor(swiftFile).relativizeFrom(intermediateFilesDir).path)
@@ -390,6 +392,7 @@ class SwiftIncrementalBuildIntegrationTest extends AbstractInstalledToolChainInt
 
         result.add("module.swiftdeps")
         result.add("output-file-map.json")
+        println("Current tool chain: ${toolChain.version} result: ${result}")
         return result
     }
 
