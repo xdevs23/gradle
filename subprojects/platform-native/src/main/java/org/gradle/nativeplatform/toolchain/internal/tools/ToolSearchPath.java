@@ -66,11 +66,13 @@ public class ToolSearchPath {
                 executables.put(exeName, executable);
             }
         }
+        System.out.println("Found exe: " + executable);
         return executable == null || !executable.isFile() ? new MissingTool(key, exeName, pathEntries) : new FoundTool(executable);
     }
 
     private File findExecutable(OperatingSystem operatingSystem, String name) {
         List<File> path = pathEntries.isEmpty() ? operatingSystem.getPath() : pathEntries;
+        System.out.println("Find exe: " + path);
         String exeName = operatingSystem.getExecutableName(name);
         try {
             if (name.contains(File.separator)) {
