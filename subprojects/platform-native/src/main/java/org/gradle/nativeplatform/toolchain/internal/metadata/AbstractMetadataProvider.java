@@ -54,6 +54,7 @@ public abstract class AbstractMetadataProvider<T extends CompilerMetadata> imple
         String output = transform.getLeft();
         String error = transform.getRight();
         if (execSpec.executable.getName().contains("swiftc")) {
+            new Throwable().printStackTrace();
             System.out.println("Swiftc probe execution result:\nStdout:\n" + output + "\nStderr:\n" + error);
         }
         try {
