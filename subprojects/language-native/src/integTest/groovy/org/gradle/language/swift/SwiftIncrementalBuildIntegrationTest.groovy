@@ -43,6 +43,7 @@ import spock.lang.IgnoreIf
 class SwiftIncrementalBuildIntegrationTest extends AbstractInstalledToolChainIntegrationSpec {
     @ToBeFixedForConfigurationCache
     def "rebuilds application when a single source file changes"() {
+        println "PATH: ${System.getenv('PATH')}"
         settingsFile << "rootProject.name = 'app'"
         def app = new IncrementalSwiftModifyExpectedOutputApp()
 
