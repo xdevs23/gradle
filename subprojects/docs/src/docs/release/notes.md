@@ -143,9 +143,13 @@ For more information see the section on [continuous build](userguide/command_lin
 
 ### Improvements for IDE integrators
 
-#### Task execution with TestLauncher
+#### TestLauncher improvements
 
-The [TestLauncher](javadoc/org/gradle/tooling/TestLauncher.html) interface now allows Tooling API clients to execute any tasks along with the selected tasks.
+The [TestLauncher](javadoc/org/gradle/tooling/TestLauncher.html) interface now allows Tooling API clients to
+- execute any tasks along with the selected tasks, and
+- select test classes, methods, packages and patterns with a new API.
+
+Task execution:
 
 ```
 ProjectConnection connection = ...
@@ -155,7 +159,20 @@ connection.newTestLauncher()
           .run()
 ```
 
-Note, that the task execution only works if the target Gradle version is >=7.5.
+Test selection:
+
+```
+TestLauncher testLauncher = projectConnection.newTestLauncher();
+testLauncher.withTestsFor(spec -> {
+    spec.forTaskPath(":test")
+        .includePackage("org.pkg")
+        .includeClass("com.TestClass")
+        .includeMethod("com.TestClass")
+        .includePattern("io.*")
+}).run();
+```
+
+Note, that the new test selection interface only works if the target Gradle version is >=7.5.
 
 <!-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ADD RELEASE FEATURES ABOVE
