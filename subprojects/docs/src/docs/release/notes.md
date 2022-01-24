@@ -162,6 +162,25 @@ BUILD SUCCESSFUL in 550ms
 1 actionable task: 1 executed 
 ```
 
+### Improvements for IDE integrators
+
+#### Fine-grained task selection with TestLauncher
+
+The [TestLauncher](javadoc/org/gradle/tooling/TestLauncher.html) interface now allows Tooling API clients to select test classes, methods, packages and patterns with a new API.
+
+```
+TestLauncher testLauncher = projectConnection.newTestLauncher();
+testLauncher.withTestsFor(spec -> {
+    spec.forTaskPath(":test")
+        .includePackage("org.pkg")
+        .includeClass("com.TestClass")
+        .includeMethod("com.TestClass")
+        .includePattern("io.*")
+}).run();
+```
+
+Note, that the new test selection interface only works if the target Gradle version is >=7.5.
+
 <!-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ADD RELEASE FEATURES ABOVE
 ==========================================================
