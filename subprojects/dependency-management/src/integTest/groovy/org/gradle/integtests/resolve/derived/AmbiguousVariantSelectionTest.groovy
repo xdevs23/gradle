@@ -30,19 +30,19 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
                 version = '1.0'
 
                 configurations {
-                    def attrA = Attribute.of('A', String)
-                    def attrB = Attribute.of('B', String)
+                    def usage = Attribute.of('usage', String)
+                    def libraryelements = Attribute.of('libraryelements', String)
 
                     fooElements {
                         canBeResolved = false
                         canBeConsumed = true
                         attributes {
-                            attribute(attrA, '1')
-                            attribute(attrB, '2')
+                            attribute(usage, 'java-api')
+                            attribute(libraryelements, 'classes')
                         }
 
                         outgoing {
-                            artifact(layout.projectDirectory.file(project.name + '-foo.txt'))
+                            artifact(layout.projectDirectory.dir(project.name + '-foo'))
                         }
                     }
 
@@ -50,12 +50,12 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
                         canBeResolved = false
                         canBeConsumed = true
                         attributes {
-                            attribute(attrA, '2')
-                            attribute(attrB, '1')
+                            attribute(usage, 'java-runtime')
+                            attribute(libraryelements, 'jar')
                         }
 
                         outgoing {
-                            artifact(layout.projectDirectory.file(project.name + '-bar.txt'))
+                            artifact(layout.projectDirectory.file(project.name + '-bar.jar'))
                         }
                     }
                 }
@@ -63,8 +63,8 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
 
             file('consumer/build.gradle') << """
 
-                def attrA = Attribute.of('A', String)
-                def attrB = Attribute.of('B', String)
+                def usage = Attribute.of('usage', String)
+                def libraryelements = Attribute.of('libraryelements', String)
 
                 class AmbiguousCompatibilityRule implements AttributeCompatibilityRule<String> {
                     void execute(CompatibilityCheckDetails<String> details) {
@@ -73,10 +73,10 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
                 }
 
                 dependencies.attributesSchema {
-                    attribute(attrA) {
+                    attribute(usage) {
                         compatibilityRules.add(AmbiguousCompatibilityRule)
                     }
-                    attribute(attrB) {
+                    attribute(libraryelements) {
                         compatibilityRules.add(AmbiguousCompatibilityRule)
                     }
                 }
@@ -84,8 +84,8 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
                 configurations {
                     producerArtifacts {
                         attributes {
-                            attribute(attrA, '1') // adjust these to select a different variant
-                            attribute(attrB, '1') // adjust these to select a different variant
+                            attribute(usage, 'java-api') // adjust these to select a different variant
+                            attribute(libraryelements, 'jar') // adjust these to select a different variant
                         }
                     }
                 }
@@ -113,8 +113,8 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
                 tasks.register('resolveAmbiguous', Resolve) {
                     artifacts.from(configurations.producerArtifacts.incoming.artifactView {
                         attributes {
-                            attribute(attrA, '2')
-                            attribute(attrB, '1')
+                            attribute(usage, 'java-runtime')
+                            attribute(libraryelements, 'jar')
                         }
                     }.files)
                 }
@@ -126,7 +126,7 @@ class AmbiguousVariantSelectionTest extends AbstractIntegrationSpec {
         when:
         file('consumer/build.gradle') << '''
             resolve {
-                expectations = [ 'producer-foo.txt' ] // TODO really?
+                expectations = [ 'producer-foo' ] // a directory
             }
         '''
 
