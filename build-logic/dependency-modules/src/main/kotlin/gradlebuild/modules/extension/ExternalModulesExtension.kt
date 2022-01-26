@@ -46,6 +46,7 @@ abstract class ExternalModulesExtension {
     val commonsCompress = "org.apache.commons:commons-compress"
     val commonsHttpclient = "org.apache.httpcomponents:httpclient"
     val commonsIo = "commons-io:commons-io"
+    val openTest4j = "org.opentest4j:opentest4j" // TODO opentest4j-specific classes should go to the testing-junit-platform project (and probably inject code with services)
     val commonsLang = "commons-lang:commons-lang"
     val commonsLang3 = "org.apache.commons:commons-lang3"
     val commonsMath = "org.apache.commons:commons-math3"
@@ -193,6 +194,7 @@ abstract class ExternalModulesExtension {
         commonsCompress to License.Apache2,
         commonsHttpclient to License.Apache2,
         commonsIo to License.Apache2,
+        openTest4j to License.Apache2, // TODO opentest4j-specific classes should go to the testing-junit-platform project (and probably inject code with services)
         commonsLang to License.Apache2,
         commonsLang3 to License.Apache2,
         commonsMath to License.Apache2,

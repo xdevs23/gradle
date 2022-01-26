@@ -33,6 +33,7 @@ import org.gradle.internal.operations.OperationFinishEvent;
 import org.gradle.internal.operations.OperationIdentifier;
 import org.gradle.internal.operations.OperationStartEvent;
 import org.gradle.tooling.events.OperationType;
+import org.gradle.tooling.internal.protocol.InternalFailure;
 import org.gradle.tooling.internal.protocol.events.InternalJvmTestDescriptor;
 import org.gradle.tooling.internal.protocol.events.InternalOperationFinishedProgressEvent;
 import org.gradle.tooling.internal.protocol.events.InternalOperationStartedProgressEvent;
@@ -128,8 +129,8 @@ class TestOperationMapper implements BuildOperationMapper<ExecuteTestBuildOperat
         }
     }
 
-    private static List<DefaultFailure> convertExceptions(List<Throwable> exceptions) {
-        List<DefaultFailure> failures = new ArrayList<>(exceptions.size());
+    private static List<InternalFailure> convertExceptions(List<Throwable> exceptions) {
+        List<InternalFailure> failures = new ArrayList<>(exceptions.size());
         for (Throwable exception : exceptions) {
             failures.add(DefaultFailure.fromThrowable(exception));
         }

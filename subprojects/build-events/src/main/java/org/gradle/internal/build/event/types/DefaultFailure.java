@@ -16,6 +16,7 @@
 package org.gradle.internal.build.event.types;
 
 import org.gradle.tooling.internal.protocol.InternalFailure;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class DefaultFailure implements Serializable, InternalFailure {
     private final String description;
     private final DefaultFailure cause;
 
-    public DefaultFailure(String message, String description, DefaultFailure cause) {
+    protected DefaultFailure(String message, String description, DefaultFailure cause) {
         this.message = message;
         this.description = description;
         this.cause = cause;
@@ -50,13 +51,18 @@ public class DefaultFailure implements Serializable, InternalFailure {
         return cause == null ? Collections.<InternalFailure>emptyList() : Collections.singletonList(cause);
     }
 
-    public static DefaultFailure fromThrowable(Throwable t) {
+    public static InternalFailure fromThrowable(Throwable t) {
+        // TODO create dedicated factory for all internal failures
+        // TODO opentest4j-specific classes should go to the testing-junit-platform project (and probably inject code with services)
+        if (t instanceof AssertionFailedError) {
+            return DefaultAssertionFailure.fromThrowable(t);
+        }
         StringWriter out = new StringWriter();
         PrintWriter wrt = new PrintWriter(out);
         t.printStackTrace(wrt);
         Throwable cause = t.getCause();
-        DefaultFailure causeFailure = cause != null && cause != t ? fromThrowable(cause) : null;
-        return new DefaultFailure(t.getMessage(), out.toString(), causeFailure);
+        InternalFailure causeFailure = cause != null && cause != t ? fromThrowable(cause) : null; // TODO restore cause field
+        return new DefaultFailure(t.getMessage(), out.toString(), null);
     }
 
 }

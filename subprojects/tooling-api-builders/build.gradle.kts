@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.groovy) // for 'Closure'
     implementation(libs.guava)
     implementation(libs.commonsIo)
+    implementation(libs.openTest4j) // TODO opentest4j-specific classes should go to the testing-junit-platform project (and probably inject code with services)
 
     testImplementation(project(":file-collections"))
     testImplementation(project(":platform-jvm"))

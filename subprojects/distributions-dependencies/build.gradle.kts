@@ -53,6 +53,7 @@ dependencies {
         api(libs.commonsCompress)       { version { strictly("1.21") }}
         api(libs.commonsHttpclient)     { version { strictly("4.5.13") }}
         api(libs.commonsIo)             { version { strictly("2.6") }}
+        api(libs.openTest4j)            { version { strictly("1.2.0") }} // TODO opentest4j-specific classes should go to the testing-junit-platform project (and probably inject code with services)
         api(libs.commonsLang)           { version { strictly("2.6") }}
         api(libs.commonsLang3)          { version { strictly("3.12.0") }}
         api(libs.commonsMath)           { version { strictly("3.6.1") }}

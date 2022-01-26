@@ -21,6 +21,7 @@ shadedJar {
 }
 
 dependencies {
+    api("org.opentest4j:opentest4j:1.2.0") // TODO opentest4j-specific classes should go to the testing-junit-platform project (and probably inject code with services)
     shadedImplementation(libs.slf4jApi)
 
     implementation(project(":base-services"))
