@@ -24,6 +24,7 @@ import org.gradle.api.internal.tasks.testing.TestDescriptorInternal;
 import org.gradle.api.internal.tasks.testing.TestResultProcessor;
 import org.gradle.api.internal.tasks.testing.TestStartEvent;
 import org.gradle.api.internal.tasks.testing.junit.JUnitSupport;
+import org.gradle.api.tasks.testing.TestFailure;
 import org.gradle.api.tasks.testing.TestResult.ResultType;
 import org.gradle.internal.MutableBoolean;
 import org.gradle.internal.id.CompositeIdGenerator;
@@ -101,16 +102,53 @@ public class JUnitPlatformTestExecutionListener implements TestExecutionListener
             reportStartedUnlessAlreadyStarted(testIdentifier);
             Throwable failure = testExecutionResult.getThrowable().orElseGet(() -> new AssertionError("test failed but did not report an exception"));
             if (testIdentifier.isTest()) {
-                resultProcessor.failure(getId(testIdentifier), failure);
+                reportTestFailure(testIdentifier, failure);
             } else {
                 TestDescriptorInternal syntheticTestDescriptor = createSyntheticTestDescriptorForContainer(testIdentifier);
                 resultProcessor.started(syntheticTestDescriptor, startEvent(getId(testIdentifier)));
-                resultProcessor.failure(syntheticTestDescriptor.getId(), failure);
+                resultProcessor.failure(syntheticTestDescriptor.getId(), TestFailure.fromTestFrameworkFailure(failure));
                 resultProcessor.completed(syntheticTestDescriptor.getId(), completeEvent());
             }
         }
         if (wasStarted(testIdentifier)) {
             resultProcessor.completed(getId(testIdentifier), completeEvent());
+        }
+    }
+
+    private void reportTestFailure(TestIdentifier testIdentifier, Throwable failure) {
+        // All assertion errors are subclasses of the AssertionError class: https://ota4j-team.github.io/opentest4j/docs/current/api/overview-tree.html
+        if (failure instanceof AssertionError) {
+            resultProcessor.failure(getId(testIdentifier), TestFailure.fromTestAssertionFailure(failure));
+        } else {
+            resultProcessor.failure(getId(testIdentifier), TestFailure.fromTestFrameworkFailure(failure));
+        }
+    }
+
+    private static String reflectivelyReadExpected(Throwable failure) {
+        return reflectivelyRead(failure, "getExpected");
+    }
+
+    private static String reflectivelyReadActual(Throwable failure) {
+        return reflectivelyRead(failure, "getActual");
+    }
+
+    private static String reflectivelyRead(Object target, String methodName) {
+        String toStringMethod = isAssertionFailedErrorOrSubclass(target.getClass()) ? "getStringRepresentation" : "toString";
+        try {
+            Object value = target.getClass().getMethod(methodName).invoke(target);
+            return value == null ? null : (String) value.getClass().getMethod(toStringMethod).invoke(value);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    private static boolean isAssertionFailedErrorOrSubclass(Class<?> cls) {
+        if (cls.getCanonicalName().equals("org.opentest4j.AssertionFailedError")) {
+            return true;
+        } else if (cls.getSuperclass() != null) {
+            return isAssertionFailedErrorOrSubclass(cls.getSuperclass());
+        } else {
+            return false;
         }
     }
 
@@ -159,7 +197,7 @@ public class JUnitPlatformTestExecutionListener implements TestExecutionListener
 
     private boolean wasStarted(TestIdentifier testIdentifier) {
         return descriptorsByUniqueId.containsKey(testIdentifier.getUniqueId());
-    }
+}
 
     private boolean createDescriptorIfAbsent(TestIdentifier node) {
         MutableBoolean wasCreated = new MutableBoolean(false);
