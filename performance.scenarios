@@ -1,0 +1,27 @@
+CompileAllBuild {
+    tasks = ["compileAllBuild", "--no-build-cache"]
+    cleanup-tasks = ["clean"]
+    run-using = cli
+    daemon = warm
+}
+
+TestOnlyChange {
+    tasks = ["cli:test"]
+    apply-non-abi-change-to = ["subprojects/cli/src/test/groovy/org/gradle/cli/CommandLineParserTest.groovy"]
+    run-using = cli
+    daemon = warm
+}
+
+IncrementalBuildWithNonABIChange {
+    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest"]
+    apply-non-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
+    run-using = cli
+    daemon = warm
+}
+
+IncrementalBuildWithABIChange {
+    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest"]
+    apply-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
+    run-using = cli
+    daemon = warm
+}
