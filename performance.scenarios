@@ -1,26 +1,26 @@
-CompileAllBuild {
-    tasks = ["compileAllBuild", "--no-build-cache"]
+CleanCompileAllBuild {
+    tasks = ["compileAllBuild", "--no-build-cache", "-Dscan.tag.LocalBuildBenchmarkCleanCompileAllBuild"]
     cleanup-tasks = ["clean"]
     run-using = cli
     daemon = warm
 }
 
 TestOnlyChange {
-    tasks = ["cli:test"]
-    apply-non-abi-change-to = ["subprojects/cli/src/test/groovy/org/gradle/cli/CommandLineParserTest.groovy"]
+    tasks = ["core-api:test", "-Dscan.tag.LocalBuildBenchmarkTestOnlyChange"]
+    apply-non-abi-change-to = ["subprojects/core-api/src/test/groovy/org/gradle/api/file/RelativePathTest.java"]
     run-using = cli
     daemon = warm
 }
 
 IncrementalBuildWithNonABIChange {
-    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest"]
+    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest", "-Dscan.tag.LocalBuildBenchmarkIncrementalBuildWithNonABIChange"]
     apply-non-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
     run-using = cli
     daemon = warm
 }
 
 IncrementalBuildWithABIChange {
-    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest"]
+    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest", "-Dscan.tag.LocalBuildBenchmarkIncrementalBuildWithABIChange"]
     apply-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
     run-using = cli
     daemon = warm
