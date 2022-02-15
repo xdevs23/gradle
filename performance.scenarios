@@ -3,6 +3,8 @@ CleanCompileAllBuild {
     cleanup-tasks = ["clean"]
     run-using = cli
     daemon = warm
+    iterations = 2
+    warm-ups = 1
 }
 
 TestOnlyChange {
@@ -10,6 +12,8 @@ TestOnlyChange {
     apply-non-abi-change-to = ["subprojects/core-api/src/test/groovy/org/gradle/api/file/RelativePathTest.java"]
     run-using = cli
     daemon = warm
+    iterations = 2
+    warm-ups = 1
 }
 
 IncrementalBuildWithNonABIChange {
@@ -17,6 +21,8 @@ IncrementalBuildWithNonABIChange {
     apply-non-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
     run-using = cli
     daemon = warm
+    iterations = 2
+    warm-ups = 1
 }
 
 IncrementalBuildWithABIChange {
@@ -24,6 +30,8 @@ IncrementalBuildWithABIChange {
     apply-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
     run-using = cli
     daemon = warm
+    iterations = 2
+    warm-ups = 1
 }
 
 IncrementalBuildWithBuildLogicChange {
@@ -31,4 +39,6 @@ IncrementalBuildWithBuildLogicChange {
     apply-abi-change-to = ["build-logic/integration-testing/src/main/kotlin/gradlebuild/integrationtests/tasks/IntegrationTest.kt"]
     run-using = cli
     daemon = warm
+    iterations = 2
+    warm-ups = 1
 }
