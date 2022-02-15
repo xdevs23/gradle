@@ -32,20 +32,3 @@ IncrementalBuildWithBuildLogicChange {
     run-using = cli
     daemon = warm
 }
-
-IDESyncWithBuildLogicChange {
-    tasks = ["idea", "-Dscan.tag.IDESyncWithBuildLogicChange"]
-    apply-abi-change-to = ["build-logic/integration-testing/src/main/kotlin/gradlebuild/integrationtests/tasks/IntegrationTest.kt"]
-    run-using = cli
-    daemon = warm
-}
-
-IDESyncWithDependenciesChange {
-    tasks = ["idea", "-Dscan.tag.IDESyncWithDependenciesChange"]
-    apply-project-dependency-change-to {
-        files = ["build.gradle.kts"]
-        dependency-count = 1
-    }
-    run-using = cli
-    daemon = warm
-}

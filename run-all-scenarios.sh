@@ -5,5 +5,3 @@ gradle-profiler --profile buildscan --scenario-file performance.scenarios --proj
 gradle-profiler --profile buildscan --scenario-file performance.scenarios --project-dir . IncrementalBuildWithNonABIChange
 gradle-profiler --profile buildscan --scenario-file performance.scenarios --project-dir . IncrementalBuildWithABIChange
 gradle-profiler --profile buildscan --scenario-file performance.scenarios --project-dir . IncrementalBuildWithBuildLogicChange
-gradle-profiler --profile buildscan --scenario-file performance.scenarios --project-dir . IDESyncWithBuildLogicChange
-gradle-profiler --profile buildscan --scenario-file performance.scenarios --project-dir . IDESyncWithDependenciesChange
