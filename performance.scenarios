@@ -3,7 +3,6 @@ CleanCompileAllBuild {
     cleanup-tasks = ["clean"]
     run-using = cli
     daemon = warm
-    usesScanPlugin = true
 }
 
 TestOnlyChange {
@@ -11,7 +10,6 @@ TestOnlyChange {
     apply-non-abi-change-to = ["subprojects/core-api/src/test/groovy/org/gradle/api/file/RelativePathTest.java"]
     run-using = cli
     daemon = warm
-    usesScanPlugin = true
 }
 
 IncrementalBuildWithNonABIChange {
@@ -19,7 +17,6 @@ IncrementalBuildWithNonABIChange {
     apply-non-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
     run-using = cli
     daemon = warm
-    usesScanPlugin = true
 }
 
 IncrementalBuildWithABIChange {
@@ -27,7 +24,6 @@ IncrementalBuildWithABIChange {
     apply-abi-change-to = ["subprojects/core/src/main/java/org/gradle/api/internal/project/DefaultProject.java"]
     run-using = cli
     daemon = warm
-    usesScanPlugin = true
 }
 
 IncrementalBuildWithBuildLogicChange {
@@ -35,11 +31,21 @@ IncrementalBuildWithBuildLogicChange {
     apply-abi-change-to = ["build-logic/integration-testing/src/main/kotlin/gradlebuild/integrationtests/tasks/IntegrationTest.kt"]
     run-using = cli
     daemon = warm
-    usesScanPlugin = true
 }
 
 IDESyncWithBuildLogicChange {
+    tasks = ["idea", "-Dscan.tag.IDESyncWithBuildLogicChange"]
+    apply-abi-change-to = ["build-logic/integration-testing/src/main/kotlin/gradlebuild/integrationtests/tasks/IntegrationTest.kt"]
+    run-using = cli
+    daemon = warm
 }
 
 IDESyncWithDependenciesChange {
+    tasks = ["idea", "-Dscan.tag.IDESyncWithDependenciesChange"]
+    apply-project-dependency-change-to {
+        files = ["build.gradle.kts"]
+        dependency-count = 1
+    }
+    run-using = cli
+    daemon = warm
 }

@@ -44,10 +44,6 @@ See the License for the specific language governing permissions and
 limitations under the License."""
 }
 
-tasks.idea {
-    doFirst { throw RuntimeException("To import in IntelliJ, please follow the instructions here: https://github.com/gradle/gradle/blob/master/CONTRIBUTING.md#intellij") }
-}
-
 if (idea.project != null) { // may be null during script compilation
     idea {
         module {
