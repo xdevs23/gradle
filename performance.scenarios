@@ -25,3 +25,17 @@ IncrementalBuildWithABIChange {
     run-using = cli
     daemon = warm
 }
+
+IncrementalBuildWithBuildLogicABIChange {
+    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest", "-Dscan.tag.IncrementalBuildWithBuildLogicABIChange"]
+    apply-abi-change-to = ["build-logic/integration-testing/src/main/kotlin/gradlebuild/integrationtests/tasks/IntegrationTest.kt"]
+    run-using = cli
+    daemon = warm
+}
+
+IncrementalBuildWithBuildLogicNonABIChange {
+    tasks = ["core:embeddedIntegTest", "--tests", "BuildExecutionEventsIntegrationTest", "-Dscan.tag.IncrementalBuildWithBuildLogicNonABIChange"]
+    apply-abi-change-to = ["build-logic/integration-testing/src/main/kotlin/gradlebuild/integrationtests/tasks/IntegrationTest.kt"]
+    run-using = cli
+    daemon = warm
+}
