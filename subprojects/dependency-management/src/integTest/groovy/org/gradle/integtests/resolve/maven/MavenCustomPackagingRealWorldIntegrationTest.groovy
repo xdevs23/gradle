@@ -45,7 +45,7 @@ class MavenCustomPackagingRealWorldIntegrationTest extends AbstractIntegrationSp
         """.stripIndent()
 
         when:
-        succeeds('resolve')
+        succeeds('resolve', '--info')
 
         then:
         file('libs').assertHasDescendants('ha-api-3.1.7.jar')
@@ -72,7 +72,7 @@ class MavenCustomPackagingRealWorldIntegrationTest extends AbstractIntegrationSp
         """.stripIndent()
 
         when:
-        succeeds('resolve')
+        succeeds('resolve', '--info')
 
         then:
         file('libs').assertHasDescendants('ha-api-3.1.7.jar')
@@ -97,7 +97,7 @@ class MavenCustomPackagingRealWorldIntegrationTest extends AbstractIntegrationSp
         """.stripIndent()
 
         when:
-        succeeds('resolve')
+        succeeds('resolve', '--info')
 
         then:
         file('libs').assertContainsDescendants('nifi-smb-nar-1.12.0.nar')
@@ -124,7 +124,7 @@ class MavenCustomPackagingRealWorldIntegrationTest extends AbstractIntegrationSp
         """.stripIndent()
 
         when:
-        succeeds('resolve')
+        succeeds('resolve', '--info')
 
         then:
         file('libs').assertContainsDescendants('nifi-smb-nar-1.12.0.nar')
