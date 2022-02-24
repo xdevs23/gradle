@@ -174,6 +174,9 @@ public interface ExecutionPlan extends Describable, Closeable {
 
     void addEntryTasks(Collection<? extends Task> tasks, int ordinal);
 
+    /**
+     * Prepares for execution once all nodes have been added.
+     */
     void determineExecutionPlan();
 
     /**

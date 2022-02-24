@@ -39,11 +39,11 @@ public class DefaultBuildWorkPreparer implements BuildWorkPreparer {
     @Override
     public void populateWorkGraph(GradleInternal gradle, ExecutionPlan plan, Consumer<? super ExecutionPlan> action) {
         action.accept(plan);
-        plan.determineExecutionPlan();
     }
 
     @Override
     public void finalizeWorkGraph(GradleInternal gradle, ExecutionPlan plan) {
+        plan.determineExecutionPlan();
         TaskExecutionGraphInternal taskGraph = gradle.getTaskGraph();
         taskGraph.populate(plan);
         BuildOutputCleanupRegistry buildOutputCleanupRegistry = gradle.getServices().get(BuildOutputCleanupRegistry.class);
