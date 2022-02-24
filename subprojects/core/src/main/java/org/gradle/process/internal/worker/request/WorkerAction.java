@@ -91,6 +91,7 @@ public class WorkerAction implements Action<WorkerProcessContext>, Serializable,
 
         try {
             completed.await();
+            System.out.println(System.currentTimeMillis() + " stopping " + connection);
         } catch (InterruptedException e) {
             throw UncheckedException.throwAsUncheckedException(e);
         }
@@ -98,6 +99,7 @@ public class WorkerAction implements Action<WorkerProcessContext>, Serializable,
 
     @Override
     public void stop() {
+        System.out.println(System.currentTimeMillis() + " RECEIVED STOP! ");
         completed.countDown();
         CurrentBuildOperationRef.instance().clear();
     }

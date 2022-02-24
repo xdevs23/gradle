@@ -157,6 +157,15 @@ public class MessageHubBackedObjectConnection implements ObjectConnection {
     }
 
     @Override
+    public String toString() {
+        return "MessageHubBackedObjectConnection{" +
+                "hub=" + hub +
+                ", connection=" + connection +
+                ", aborted=" + aborted +
+                '}';
+    }
+
+    @Override
     public void addUnrecoverableErrorHandler(Action<Throwable> handler) {
         unrecoverableErrorHandlers.add(handler);
     }

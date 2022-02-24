@@ -167,9 +167,11 @@ class DefaultMultiRequestWorkerProcessBuilder<IN, OUT> implements MultiRequestWo
             @Override
             public ExecResult stop() {
                 if (requestProtocol != null) {
+                    System.out.println(System.currentTimeMillis() + " asking for stop: " + workerProcess.getConnection());
                     requestProtocol.stop();
                 }
                 try {
+                    System.out.println(System.currentTimeMillis() + " waiting for stop: " + workerProcess.getConnection());
                     return workerProcess.waitForStop();
                 } finally {
                     requestProtocol = null;

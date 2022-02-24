@@ -19,20 +19,22 @@ package org.gradle.api.tasks
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.BuildOperationsFixture
 import org.gradle.integtests.fixtures.executer.GradleContextualExecuter
-import org.gradle.integtests.fixtures.timeout.IntegrationTestTimeout
 import org.gradle.internal.execution.timeout.impl.DefaultTimeoutHandler
-import org.gradle.internal.logging.events.operations.LogEventBuildOperationProgressDetails
 import org.gradle.test.fixtures.file.LeaksFileHandles
+import org.gradle.test.fixtures.file.TestFile
+import org.gradle.util.GradleVersion
 import spock.lang.IgnoreIf
 
 import java.time.Duration
 
+import static org.gradle.cache.internal.VersionSpecificCacheCleanupFixture.MarkerFileType.NOT_USED_WITHIN_30_DAYS
+import static org.gradle.cache.internal.VersionSpecificCacheCleanupFixture.MarkerFileType.USED_TODAY
+
 // https://github.com/gradle/gradle-private/issues/3433
 @IgnoreIf({ GradleContextualExecuter.isNoDaemon() })
-@IntegrationTestTimeout(60)
-class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
+class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec implements org.gradle.cache.internal.GradleUserHomeCleanupFixture {
 
-    private static final TIMEOUT = 500
+    private static final TIMEOUT = 10000
 
     long postTimeoutCheckFrequencyMs = Duration.ofMinutes(3).toMillis()
     long slowStopLogStacktraceFrequencyMs = Duration.ofMinutes(3).toMillis()
@@ -47,132 +49,6 @@ class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
             ].each { k, v ->
                 executer.withArgument("-D$k=$v".toString())
             }
-        }
-    }
-
-    def "fails when negative timeout is specified"() {
-        given:
-        buildFile << """
-            task broken() {
-                doLast {
-                    println "Hello"
-                }
-                timeout = Duration.ofMillis(-1)
-            }
-            """
-
-        expect:
-        2.times {
-            fails "broken"
-            failure.assertHasDescription("Execution failed for task ':broken'.")
-            failure.assertHasCause("Timeout of task ':broken' must be positive, but was -0.001S")
-            result.assertNotOutput("Hello")
-        }
-    }
-
-    def "timeout stops long running method call"() {
-        given:
-        buildFile << """
-            task block() {
-                doLast {
-                    Thread.sleep(60000)
-                }
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        2.times {
-            fails "block"
-            failure.assertHasDescription("Execution failed for task ':block'.")
-            failure.assertHasCause("Timeout has been exceeded")
-        }
-    }
-
-    def "other tasks still run after a timeout if --continue is used"() {
-        given:
-        buildFile << """
-            task block() {
-                doLast {
-                    Thread.sleep(60000)
-                }
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-
-            task foo() {
-            }
-            """
-
-        expect:
-        2.times {
-            fails "block", "foo", "--continue"
-            result.assertTaskExecuted(":foo")
-            failure.assertHasDescription("Execution failed for task ':block'.")
-            failure.assertHasCause("Timeout has been exceeded")
-        }
-    }
-
-    def "timeout stops long running exec()"() {
-        given:
-        file('src/main/java/Block.java') << """
-            import java.util.concurrent.CountDownLatch;
-            import java.util.concurrent.TimeUnit;
-
-            public class Block {
-                public static void main(String[] args) throws InterruptedException {
-                    new CountDownLatch(1).await(90, TimeUnit.SECONDS);
-                }
-            }
-        """
-        buildFile << """
-            apply plugin: 'java'
-            task block(type: JavaExec) {
-                classpath = sourceSets.main.output
-                mainClass = 'Block'
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        2.times {
-            fails "block"
-            failure.assertHasDescription("Execution failed for task ':block'.")
-            failure.assertHasCause("Timeout has been exceeded")
-        }
-    }
-
-    def "timeout stops long running tests"() {
-        given:
-        (1..100).each { i ->
-            file("src/test/java/Block${i}.java") << """
-                import java.util.concurrent.CountDownLatch;
-                import java.util.concurrent.TimeUnit;
-                import org.junit.Test;
-
-                public class Block${i} {
-                    @Test
-                    public void test() throws InterruptedException {
-                        new CountDownLatch(1).await(90, TimeUnit.SECONDS);
-                    }
-                }
-            """
-        }
-        buildFile << """
-            apply plugin: 'java'
-            ${mavenCentralRepository()}
-            dependencies {
-                testImplementation 'junit:junit:4.13'
-            }
-            test {
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        2.times {
-            fails "test"
-            failure.assertHasDescription("Execution failed for task ':test'.")
-            failure.assertHasCause("Timeout has been exceeded")
         }
     }
 
@@ -209,14 +85,16 @@ class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
 
             abstract class BlockingWorkAction implements WorkAction<WorkParameters.None> {
                 public void execute() {
-                    new CountDownLatch(1).await(90, TimeUnit.SECONDS);
+                    System.out.println("about to wait");
+                    new CountDownLatch(1).await(30, TimeUnit.SECONDS);
+                    System.out.println("Still working?");
                 }
             }
             """
 
         expect:
-        2.times {
-            fails "block"
+        1.times {
+            fails "block", "--info"
             failure.assertHasDescription("Execution failed for task ':block'.")
             failure.assertHasCause("Timeout has been exceeded")
             if (isolationMode == 'process' && failure.output.contains("Caused by:")) {
@@ -225,149 +103,49 @@ class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
         }
 
         where:
-        isolationMode << ['no', 'classLoader', 'process']
+        isolationMode << ['process']
     }
 
-    def "message is logged when stop is requested"() {
+    def "cleans up unused version-specific cache directories and corresponding distributions"() {
         given:
-        buildFile << """
-            task block() {
-                doLast {
-                    Thread.sleep(60000)
-                }
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        fails "block"
+        requireOwnGradleUserHomeDir() // because we delete caches and distributions
 
         and:
-        with(result.groupedOutput.task(":block")) {
-            assertOutputContains("Requesting stop of task ':block' as it has exceeded its configured timeout of 500ms.")
-        }
+        def oldButRecentlyUsedVersion = GradleVersion.version("1.4.5")
+        def oldButRecentlyUsedCacheDir = createVersionSpecificCacheDir(oldButRecentlyUsedVersion, USED_TODAY)
+        def oldButRecentlyUsedDist = createDistributionChecksumDir(oldButRecentlyUsedVersion).parentFile
+        def oldButRecentlyUsedCustomDist = createCustomDistributionChecksumDir("my-dist-1", oldButRecentlyUsedVersion).parentFile
 
-        and:
-        taskLogging(":block") == [
-            "Requesting stop of task ':block' as it has exceeded its configured timeout of 500ms."
-        ]
+        def oldNotRecentlyUsedVersion = GradleVersion.version("2.3.4")
+        def oldNotRecentlyUsedCacheDir = createVersionSpecificCacheDir(oldNotRecentlyUsedVersion, NOT_USED_WITHIN_30_DAYS)
+        def oldNotRecentlyUsedDist = createDistributionChecksumDir(oldNotRecentlyUsedVersion).parentFile
+        def oldNotRecentlyUsedCustomDist = createCustomDistributionChecksumDir("my-dist-2", oldNotRecentlyUsedVersion).parentFile
+
+        def currentCacheDir = createVersionSpecificCacheDir(GradleVersion.current(), NOT_USED_WITHIN_30_DAYS)
+        def currentDist = createDistributionChecksumDir(GradleVersion.current()).parentFile
+
+        when:
+        succeeds("help")
+
+        then:
+        false
+
+        oldButRecentlyUsedCacheDir.assertExists()
+        oldButRecentlyUsedDist.assertExists()
+        oldButRecentlyUsedCustomDist.assertExists()
+
+        oldNotRecentlyUsedCacheDir.assertDoesNotExist()
+        oldNotRecentlyUsedDist.assertDoesNotExist()
+        oldNotRecentlyUsedCustomDist.assertDoesNotExist()
+
+        currentCacheDir.assertExists()
+        currentDist.assertExists()
+
+        getGcFile(currentCacheDir).assertExists()
     }
 
-    def "additional logging is emitted when task is slow to stop"() {
-        given:
-        postTimeoutCheckFrequencyMs = 100
-        buildFile << """
-            task block() {
-                doLast {
-                    def startAt = System.nanoTime()
-                    while (System.nanoTime() - startAt < 3_000_000_000) {}
-                }
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        fails "block"
-
-        and:
-        def outputLines = result.groupedOutput.task(":block").output.readLines()
-        outputLines[0] == "Requesting stop of task ':block' as it has exceeded its configured timeout of 500ms."
-        outputLines[1] == "Timed out task ':block' has not yet stopped."
-        outputLines[outputLines.size() - 1] == "Timed out task ':block' has stopped."
-
-        and:
-        def logging = taskLogging(":block")
-        logging[0] == "Requesting stop of task ':block' as it has exceeded its configured timeout of 500ms."
-        logging[1] == "Timed out task ':block' has not yet stopped."
-        logging[logging.size() - 1] == "Timed out task ':block' has stopped."
-    }
-
-    List<String> taskLogging(String taskPath) {
-        def taskExecutionOp = operations.only("Task $taskPath")
-        def logging = taskExecutionOp.progress.findAll { it.hasDetailsOfType(LogEventBuildOperationProgressDetails) }*.details
-        def timeoutLogging = logging.findAll { it.category == DefaultTimeoutHandler.name }
-        timeoutLogging.collect { it.message } as List<String>
-    }
-
-    def "task is re-interrupted until it stops"() {
-        given:
-        postTimeoutCheckFrequencyMs = 100
-        buildFile << """
-            task block() {
-                doLast {
-                    def interruptedCount = 0
-                    while (true) {
-                        if (Thread.interrupted()) {
-                            println "received interrupt"
-                            if (++interruptedCount == 3) {
-                                return
-                            }
-                        }
-                    }
-                }
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        fails "block"
-
-        and:
-        with(result.groupedOutput.task(":block")) {
-            output.count("received interrupt") == 3
-        }
-    }
-
-    def "stack trace of task is printed if it is slow to stop"() {
-        given:
-        executer.withStackTraceChecksDisabled()
-        postTimeoutCheckFrequencyMs = 100
-        slowStopLogStacktraceFrequencyMs = 100
-
-        buildFile << """
-            @groovy.transform.CompileStatic
-            def checkpoint1() {
-                def startAt = System.nanoTime()
-                while (System.nanoTime() - startAt < 1_000_000_000) {}
-            }
-            @groovy.transform.CompileStatic
-            def checkpoint2() {
-                def startAt = System.nanoTime()
-                while (System.nanoTime() - startAt < 1_000_000_000) {}
-            }
-            @groovy.transform.CompileStatic
-            def checkpoint3() {
-                def startAt = System.nanoTime()
-                while (System.nanoTime() - startAt < 1_000_000_000) {}
-            }
-
-            task block() {
-                doLast {
-                    checkpoint1()
-                    checkpoint2()
-                    checkpoint3()
-                }
-                timeout = Duration.ofMillis($TIMEOUT)
-            }
-            """
-
-        expect:
-        fails "block"
-
-        and:
-        with(result.groupedOutput.task(":block")) {
-            def slowStopWarningsCount = output.count("Timed out task ':block' has not yet stopped.")
-
-            def stackTraces = output.findAll(~/(?ms)(?=Timed out task ':block' has not yet stopped).+?(?=^\n)/)
-            stackTraces.size() > 1
-
-            // We should not have logged the stacktrace each time we checked if it was still running
-            stackTraces.size() < slowStopWarningsCount
-
-            // We should have only logged when it changed
-            (1..<stackTraces.size()).each {
-                stackTraces[it - 1] != stackTraces[it]
-            }
-        }
+    @Override
+    TestFile getGradleUserHomeDir() {
+        return executer.gradleUserHomeDir
     }
 }
