@@ -39,6 +39,20 @@ dependencyResolutionManagement {
                 includeModule("classycle", "classycle")
             }
         }
+//        maven {
+//            name = "JetBrains IJ releases"
+//            url = uri("https://www.jetbrains.com/intellij-repository/releases")
+//            content {
+//                includeGroup("com.jetbrains.intellij.idea")
+//            }
+//        }
+//        maven {
+//            name = "JetBrains shared index tool releases"
+//            url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-shared-indexes-public")
+//            content {
+//                includeGroup("com.jetbrains.intellij.indexing.shared")
+//            }
+//        }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -84,3 +98,4 @@ include("packaging")
 include("performance-testing")
 include("profiling")
 include("publishing")
+include("shared-indexes")
