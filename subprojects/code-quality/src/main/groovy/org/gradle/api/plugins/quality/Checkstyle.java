@@ -43,6 +43,7 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.VerificationTask;
+import org.gradle.internal.jvm.Jvm;
 import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.util.internal.ClosureBackedAction;
 import org.gradle.workers.WorkQueue;
@@ -170,7 +171,16 @@ public class Checkstyle extends SourceTask implements VerificationTask, Reportin
 
     @TaskAction
     public void run() {
-        runWithProcessIsolation();
+        runWithClassLoaderIsolation();
+    }
+
+    private boolean shouldRunWithProcessIsolation() {
+        if (!javaLauncher.isPresent()) {
+            return false;
+        }
+        String currentJdk = Jvm.current().getJavaExecutable().getAbsolutePath();
+        String requestedJdk = javaLauncher.get().getExecutablePath().getAsFile().getAbsolutePath();
+        return !currentJdk.equals(requestedJdk);
     }
 
     private void runWithProcessIsolation() {
@@ -178,6 +188,11 @@ public class Checkstyle extends SourceTask implements VerificationTask, Reportin
             spec.getForkOptions().setExecutable(javaLauncher.get().getExecutablePath().getAsFile().getAbsolutePath());
             spec.getClasspath().setFrom(getCheckstyleClasspath());
         });
+        workQueue.submit(CheckstyleAction.class, this::setupParameters);
+    }
+
+    private void runWithClassLoaderIsolation() {
+        WorkQueue workQueue = getWorkerExecutor().classLoaderIsolation(spec -> spec.getClasspath().setFrom(getCheckstyleClasspath()));
         workQueue.submit(CheckstyleAction.class, this::setupParameters);
     }
 
