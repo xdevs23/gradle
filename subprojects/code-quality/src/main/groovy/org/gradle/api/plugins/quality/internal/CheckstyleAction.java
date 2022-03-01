@@ -17,8 +17,15 @@
 package org.gradle.api.plugins.quality.internal;
 
 import groovy.lang.Closure;
+import org.gradle.internal.classpath.ClassPath;
+import org.gradle.internal.classpath.DefaultClassPath;
 
 public abstract class CheckstyleAction extends AntWorkAction<CheckstyleActionParameters> {
+
+    @Override
+    protected ClassPath getClassPath() {
+        return DefaultClassPath.of(getParameters().getClasspath().getFiles());
+    }
 
     @Override
     protected String getActionName() {
