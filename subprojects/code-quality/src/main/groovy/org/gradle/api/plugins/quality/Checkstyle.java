@@ -174,19 +174,19 @@ public class Checkstyle extends SourceTask implements VerificationTask, Reportin
     }
 
     private void runWithProcessIsolation() {
-        WorkQueue workQueue = getWorkerExecutor().processIsolation(spec ->
-            spec.getForkOptions().setExecutable(javaLauncher.get().getExecutablePath().getAsFile().getAbsolutePath())
-        );
+        WorkQueue workQueue = getWorkerExecutor().processIsolation(spec -> {
+            spec.getForkOptions().setExecutable(javaLauncher.get().getExecutablePath().getAsFile().getAbsolutePath());
+            spec.getClasspath().setFrom(getCheckstyleClasspath());
+        });
         workQueue.submit(CheckstyleAction.class, this::setupParameters);
     }
 
-    private void setupParameters(CheckstyleActionParameters parameters) {
+    private CheckstyleActionParameters setupParameters(CheckstyleActionParameters parameters) {
         parameters.getConfig().set(getConfigFile());
         parameters.getMaxErrors().set(getMaxErrors());
         parameters.getMaxWarnings().set(getMaxWarnings());
         parameters.getIgnoreFailures().set(getIgnoreFailures());
         parameters.getConfigDirectory().set(getConfigDirectory());
-        parameters.getClasspath().setFrom(getCheckstyleClasspath());
         parameters.getShowViolations().set(isShowViolations());
         parameters.getSource().setFrom(getSource());
         parameters.getIsHtmlRequired().set(getReports().getHtml().getRequired());
@@ -197,6 +197,7 @@ public class Checkstyle extends SourceTask implements VerificationTask, Reportin
         parameters.getConfigProperties().set(getConfigProperties());
         TextResource stylesheet = getReports().getHtml().getStylesheet();
         parameters.getStylesheetString().set(stylesheet != null ? stylesheet.asString() : null);
+        return parameters;
     }
 
     /**

@@ -150,6 +150,7 @@ public class DefaultIsolatedAntBuilder implements IsolatedAntBuilder, Stoppable 
                     // This looks ugly, very ugly, but that is apparently what Ant does itself
                     ClassLoader originalLoader = Thread.currentThread().getContextClassLoader();
                     Thread.currentThread().setContextClassLoader(classLoader);
+
                     try {
                         configureAntBuilder(antBuilder, antLogger);
 
