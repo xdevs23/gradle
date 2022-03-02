@@ -107,7 +107,8 @@ public class JdkCacheDirectory {
      */
     public File provisionFromArchive(File jdkArchive) {
         final File destination = unpack(jdkArchive);
-        return markJavaHome(destination);
+        File markedLocation = markJavaHome(destination);
+        return getJavaHome(markedLocation);
     }
 
     private File unpack(File jdkArchive) {
