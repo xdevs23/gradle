@@ -80,6 +80,22 @@ Note, that these changes improve the [Buildship](https://eclipse.org/buildship) 
 
 See [the documentation](userguide/eclipse_plugin.html#sec:test-sources) for more details.
 
+### JVM toolchains improvements
+
+[Java toolchains](userguide/toolchains.html) provide an easy way to declare which Java version your project should be built with.
+By default, Gradle will [detect installed JDKs](userguide/toolchains.html#sec:auto_detection) or automatically download new toolchain versions.
+
+#### Checkstyle tasks can be configured to use JVM toolchain
+
+The checkstyle task is now leveraging JVM toolchains. By default, the toolchain based on the current jdk is used.
+In combination with the Java Plugin the configured java toolchain is used for checkstyle tasks.
+
+Furthermore, the checkstyle task is now leveraging the Gradle worker API which effectively means
+
+- the checkstyle process is always running as an external process,
+- parallel task execution within a single project is improved by allowing
+  multiple checkstyle tasks within a project can now be executed in parallel.
+
 ### Improved Diagnostic Reports for dependency resolution
 
 #### Outgoing Variants
