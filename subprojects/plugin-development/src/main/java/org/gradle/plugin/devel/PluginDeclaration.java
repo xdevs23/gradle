@@ -19,7 +19,6 @@ package org.gradle.plugin.devel;
 import org.gradle.api.Named;
 
 import javax.annotation.Nullable;
-import java.io.Serializable;
 import java.util.Objects;
 
 
@@ -30,9 +29,7 @@ import java.util.Objects;
  * @see org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
  * @since 2.14
  */
-public class PluginDeclaration implements Named,
-    // TODO: Shouldn't be serializable, remove the interface in Gradle 8.0.
-    Serializable {
+public class PluginDeclaration implements Named {
     private final String name;
     private String id;
     private String implementationClass;
