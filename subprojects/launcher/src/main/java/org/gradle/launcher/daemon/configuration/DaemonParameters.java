@@ -124,10 +124,6 @@ public class DaemonParameters {
     }
 
     public void applyDefaultsFor(JavaVersion javaVersion) {
-        if (javaVersion.compareTo(JavaVersion.VERSION_1_8) < 0) {
-            throw new IllegalStateException("Running daemon on JDK < 8 is not supported");
-        }
-
         if (javaVersion.compareTo(JavaVersion.VERSION_1_9) >= 0) {
             jvmOptions.jvmArgs(ALLOW_ENVIRONMENT_VARIABLE_OVERWRITE);
             jvmOptions.jvmArgs(JpmsConfiguration.GRADLE_DAEMON_JPMS_ARGS);
