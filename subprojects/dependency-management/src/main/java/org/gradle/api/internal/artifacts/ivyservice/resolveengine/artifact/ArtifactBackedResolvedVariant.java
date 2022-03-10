@@ -16,6 +16,8 @@
 
 package org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.gradle.api.Action;
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
 import org.gradle.api.attributes.AttributeContainer;
@@ -35,7 +37,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSet.EMPTY;
 
@@ -51,14 +52,14 @@ public class ArtifactBackedResolvedVariant implements ResolvedVariant {
         this.displayName = displayName;
         this.attributes = attributes;
         this.capabilities = capabilities;
-        this.artifacts = artifacts;
+        this.artifacts = Suppliers.memoize(artifacts);
     }
 
-    public static ResolvedVariant create(@Nullable VariantResolveMetadata.Identifier identifier, DisplayName displayName, AttributeContainerInternal attributes, CapabilitiesMetadata capabilities, Supplier<Collection<? extends ResolvableArtifact>> artifacts) {
-        return new ArtifactBackedResolvedVariant(identifier, displayName, attributes, capabilities, supplyResolvedArtifactSet(identifier, displayName, attributes, capabilities, artifacts));
+    public static ResolvedVariant create(@Nullable VariantResolveMetadata.Identifier identifier, DisplayName displayName, AttributeContainerInternal attributes, CapabilitiesMetadata capabilities, java.util.function.Supplier<Collection<? extends ResolvableArtifact>> artifacts) {
+        return new ArtifactBackedResolvedVariant(identifier, displayName, attributes, capabilities, supplyResolvedArtifactSet(displayName, attributes, capabilities, artifacts));
     }
 
-    private static Supplier<ResolvedArtifactSet> supplyResolvedArtifactSet(@Nullable VariantResolveMetadata.Identifier identifier, DisplayName displayName, AttributeContainerInternal attributes, CapabilitiesMetadata capabilities, Supplier<Collection<? extends ResolvableArtifact>> artifactsSupplier) {
+    private static Supplier<ResolvedArtifactSet> supplyResolvedArtifactSet(DisplayName displayName, AttributeContainerInternal attributes, CapabilitiesMetadata capabilities, java.util.function.Supplier<Collection<? extends ResolvableArtifact>> artifactsSupplier) {
         return () -> {
             Collection<? extends ResolvableArtifact> artifacts = artifactsSupplier.get();
             if (artifacts.isEmpty()) {
