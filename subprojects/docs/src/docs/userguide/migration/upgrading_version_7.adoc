@@ -55,6 +55,10 @@ eclipse {
 
 Alternatively, you can adjust or remove classpath attributes in the `eclipse.classpath.file.whenMerged { }` block.
 
+==== Updates to bundled Gradle dependencies
+
+- Groovy has been updated to https://groovy-lang.org/releasenotes/groovy-3.0.html[Groovy 3.0.10].
+
 === Deprecations
 
 [[file_collection_to_classpath]]
