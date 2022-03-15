@@ -134,6 +134,7 @@ abstract class TestFilesCleanupService @Inject constructor(
     fun getExecutedTaskPaths(projectPath: String) = projectPathToExecutedTaskPaths.getOrDefault(projectPath, emptyList())
 
     override fun close() {
+        println("Close")
         val projectPathToLeftoverFiles = mutableMapOf<String, LeftoverFiles>()
         // First run: collect and archive leftover files
         parameters.projectStates.get().forEach { (projectPath: String, projectExtension: TestFileCleanUpExtension) ->
