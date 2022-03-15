@@ -59,12 +59,7 @@ class TestFilesCleanupRootPlugin : Plugin<Project> {
             return emptyList()
         }
         // build/test-results/embeddedIntegTest/trace.json
-        val traceJson = project.buildDir.resolve("test-results/$name/trace.json")
-        return if (traceJson.isFile) {
-            listOf(traceJson)
-        } else {
-            emptyList()
-        }
+        return listOf(project.buildDir.resolve("test-results/$name/trace.json"))
     }
 
     private
