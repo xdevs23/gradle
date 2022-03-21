@@ -19,7 +19,34 @@ package org.gradle.api.provider
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 
 class ListPropertyIntegrationTest extends AbstractIntegrationSpec {
-    def "Weird message when adding provider returning null to a list property"() {
+    def "Adding a provider returning non-null to a list property works"() {
+        given:
+        buildFile << """
+            abstract class MyTask extends DefaultTask {
+                @Input
+                abstract ListProperty<String> getMyProperty()
+
+                MyTask() {
+                    myProperty.set(['a'])
+                }
+
+                @TaskAction
+                void printText() {
+                    println myProperty.get().join(' ')
+                }
+            }
+
+            tasks.register("myTask", MyTask) {
+                myProperty.add(project.provider(() -> 'b'))
+            }
+        """.stripIndent()
+
+        expect:
+        succeeds('myTask')
+        result.getGroupedOutput().task(':myTask').assertOutputContains('a b')
+    }
+
+    def "Adding a provider returning null to a list property results in a misleading error message"() {
         given:
         buildFile << """
             abstract class MyTask extends DefaultTask {
@@ -62,31 +89,5 @@ class ListPropertyIntegrationTest extends AbstractIntegrationSpec {
         * Exception is:
         org.gradle.internal.execution.WorkValidationException: A problem was found with the configuration of task ':myTask' (type 'MyTask').
          */
-    }
-
-    def "Provider returning non-null to a list property works"() {
-        given:
-        buildFile << """
-            abstract class MyTask extends DefaultTask {
-                @Input
-                abstract ListProperty<String> getMyProperty()
-
-                MyTask() {
-                    myProperty.set(['a'])
-                }
-
-                @TaskAction
-                void printText() {
-                    println myProperty.get().join(' ')
-                }
-            }
-
-            tasks.register("myTask", MyTask) {
-                myProperty.add(project.provider(() -> 'a'))
-            }
-        """.stripIndent()
-
-        expect:
-        succeeds('myTask')
     }
 }
