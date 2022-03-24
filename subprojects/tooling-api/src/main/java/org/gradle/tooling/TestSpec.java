@@ -16,12 +16,13 @@
 
 package org.gradle.tooling;
 
+import org.gradle.api.Action;
 import org.gradle.api.Incubating;
 
 /**
  * Provides test selection from a specific test task.
  *
- * @see TestLauncher#withTestsFor(Configurable)
+ * @see TestLauncher#withTestsFor(Action)
  * @since 7.5
  */
 @Incubating

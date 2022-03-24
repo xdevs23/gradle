@@ -19,8 +19,8 @@ package org.gradle.tooling.internal.consumer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.gradle.api.Action;
 import org.gradle.api.Transformer;
-import org.gradle.tooling.Configurable;
 import org.gradle.tooling.ResultHandler;
 import org.gradle.tooling.TestExecutionException;
 import org.gradle.tooling.TestLauncher;
@@ -202,9 +202,9 @@ public class DefaultTestLauncher extends AbstractLongRunningOperation<DefaultTes
     }
 
     @Override
-    public TestLauncher withTestsFor(Configurable<TestSpec> testSpec) {
+    public TestLauncher withTestsFor(Action<TestSpec> testSpec) {
         DefaultTestSpec ts = new DefaultTestSpec();
-        testSpec.configure(ts);
+        testSpec.execute(ts);
         testPatternSpecs.addAll(ts.getTestPatternSpecs());
         return this;
     }
