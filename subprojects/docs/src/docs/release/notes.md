@@ -142,6 +142,39 @@ This means that Gradle picks up changes nearly instantly on all platforms and fi
 
 For more information see the section on [continuous build](userguide/command_line_interface.html#sec:continuous_build) in the user manual.
 
+### Improvements for IDE integrators
+
+#### TestLauncher improvements
+
+The [TestLauncher](javadoc/org/gradle/tooling/TestLauncher.html) interface now allows Tooling API clients to
+- execute any tasks along with the selected tasks, and
+- select test classes, methods, packages and patterns with a new API.
+
+Task execution:
+
+```
+ProjectConnection connection = ...
+connection.newTestLauncher()
+          .withTaskAndTestClasses("integTest", ["org.MyTest"])
+          .forTasks("startDB")
+          .run()
+```
+
+Test selection:
+
+```
+TestLauncher testLauncher = projectConnection.newTestLauncher();
+testLauncher.withTestsFor(spec -> {
+    spec.forTaskPath(":test")
+        .includePackage("org.pkg")
+        .includeClass("com.TestClass")
+        .includeMethod("com.TestClass")
+        .includePattern("io.*")
+}).run();
+```
+
+Note, that the new test selection interface only works if the target Gradle version is >=7.5.
+
 <!-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ADD RELEASE FEATURES ABOVE
 ==========================================================
