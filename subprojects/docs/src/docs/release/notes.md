@@ -1,3 +1,4 @@
+
 The Gradle team is excited to announce Gradle @version@.
 
 This release features [1](), [2](), ... [n](), and more.
@@ -164,7 +165,7 @@ BUILD SUCCESSFUL in 550ms
 
 ### Improvements for IDE integrators
 
-#### Fine-grained task selection with TestLauncher
+#### Fine-grained test selection with TestLauncher
 
 The [TestLauncher](javadoc/org/gradle/tooling/TestLauncher.html) interface now allows Tooling API clients to select test classes, methods, packages and patterns with a new API.
 
