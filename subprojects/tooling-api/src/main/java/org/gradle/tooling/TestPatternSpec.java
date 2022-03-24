@@ -27,15 +27,12 @@ import java.util.Collection;
  */
 @Incubating
 public interface TestPatternSpec {
-
-
-
     TestPatternSpec includePackage(String pkg);
     TestPatternSpec includePackages(Collection<String> packages);
     TestPatternSpec includeClass(String cls);
     TestPatternSpec includeClasses(Collection<String>  classes);
     TestPatternSpec includeMethod(String clazz, String method);
     TestPatternSpec includeMethods(String clazz, Collection<String> methods);
-    TestPatternSpec includePattern(String pattern); // TODO includePattern() is more consistent
+    TestPatternSpec includePattern(String pattern);
     TestPatternSpec includePatterns(Collection<String>  pattern);
 }
