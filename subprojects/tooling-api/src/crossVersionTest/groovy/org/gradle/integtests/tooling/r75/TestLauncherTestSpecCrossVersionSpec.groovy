@@ -188,7 +188,7 @@ class TestLauncherTestSpecCrossVersionSpec extends TestLauncherSpec {
         normaliseLineSeparators(e.cause.message) == """No matching tests found in any candidate test task.
     Requested tests:
         Test class: example.UnknownClass in task :test
-        Test method com.OtherClass.[unknownMethod]() in task :test
+        Test method com.OtherClass.unknownMethod() in task :test
         Test package com.unknown in task :test
         Test pattern not.matching.pattern in task :test"""
     }

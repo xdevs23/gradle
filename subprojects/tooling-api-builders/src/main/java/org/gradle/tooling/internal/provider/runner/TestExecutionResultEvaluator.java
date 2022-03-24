@@ -107,8 +107,10 @@ class TestExecutionResultEvaluator implements BuildOperationListener {
             for (String cls : testPatternSpec.getClasses()) {
                 requestDetails.append("\n").append(Strings.repeat(INDENT, 2)).append("Test class: ").append(cls).append(" in task " + testPatternSpec.getTaskPath());
             }
-            for (Map.Entry<String, List<String>> method : testPatternSpec.getMethods().entrySet()) {
-                requestDetails.append("\n").append(Strings.repeat(INDENT, 2)).append("Test method ").append(method.getKey()).append(".").append(method.getValue()).append("()").append(" in task " + testPatternSpec.getTaskPath());
+            for (Map.Entry<String, List<String>> methods : testPatternSpec.getMethods().entrySet()) {
+                for (String method : methods.getValue()) {
+                    requestDetails.append("\n").append(Strings.repeat(INDENT, 2)).append("Test method ").append(methods.getKey()).append(".").append(method).append("()").append(" in task " + testPatternSpec.getTaskPath());
+                }
             }
             for (String pkg : testPatternSpec.getPackages()) {
                 requestDetails.append("\n").append(Strings.repeat(INDENT, 2)).append("Test package ").append(pkg).append(" in task " + testPatternSpec.getTaskPath());
