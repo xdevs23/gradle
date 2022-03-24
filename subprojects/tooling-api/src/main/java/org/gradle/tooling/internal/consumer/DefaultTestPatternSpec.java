@@ -35,11 +35,7 @@ public class DefaultTestPatternSpec implements TestPatternSpec, InternalTestPatt
     private final List<String> patterns;
 
     DefaultTestPatternSpec(String taskPath) {
-        this.taskPath = taskPath;
-        this.classes = new ArrayList<String>();
-        this.methods = new LinkedHashMap<String, List<String>>();
-        this.packages = new ArrayList<String>();
-        this.patterns = new ArrayList<String>();
+        this(taskPath, new ArrayList<String>(), new LinkedHashMap<String, List<String>>(), new ArrayList<String>(), new ArrayList<String>());
     }
 
     public DefaultTestPatternSpec(String taskPath, List<String> classes, Map<String, List<String>> methods,  List<String> packages, List<String> patterns) {
