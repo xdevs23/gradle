@@ -27,8 +27,8 @@ import java.util.Collection;
  */
 @Incubating
 public interface TestPatternSpec {
-    TestPatternSpec includePackage(String pkg);
-    TestPatternSpec includePackages(Collection<String> packages);
+    TestPatternSpec includePackage(String pkg); // TODO document that it runs all tests from the target package and from the sub-packages
+    TestPatternSpec includePackages(Collection<String> packages); // TODO allow running tests from the target package only
     TestPatternSpec includeClass(String cls);
     TestPatternSpec includeClasses(Collection<String>  classes);
     TestPatternSpec includeMethod(String clazz, String method);
