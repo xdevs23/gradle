@@ -23,6 +23,8 @@ import org.gradle.tooling.TestExecutionException
 import org.gradle.tooling.TestLauncher
 import org.gradle.tooling.TestSpec
 
+import static org.gradle.integtests.tooling.fixture.TextUtil.normaliseLineSeparators
+
 @ToolingApiVersion('>=7.5')
 @TargetGradleVersion(">=7.5")
 class TestLauncherTestSpecCrossVersionSpec extends TestLauncherSpec {
@@ -32,7 +34,7 @@ class TestLauncherTestSpecCrossVersionSpec extends TestLauncherSpec {
     }
 
     @TargetGradleVersion('<7.5')
-    def "older Gradle versions ignore witTestsFor calls"() {
+    def "older Gradle versions ignore withTestsFor calls"() {
         when:
         launchTests { TestLauncher launcher ->
             launcher.withTestsFor { TestSpec spec ->
@@ -168,5 +170,26 @@ class TestLauncherTestSpecCrossVersionSpec extends TestLauncherSpec {
         assertTestExecuted(className: 'example2.MyOtherTest', methodName: 'bar', task: ':secondTest')
         assertTestExecuted(className: 'example2.MyOtherTest2', methodName: 'baz', task: ':secondTest')
     }
-}
 
+    def "fails with meaningful error when requested tests not found"() {
+        when:
+        launchTests { TestLauncher launcher ->
+            launcher.withTestsFor { TestSpec spec ->
+                spec.forTaskPath(':test')
+                    .includeClass('example.UnknownClass')
+                    .includePackage("com.unknown")
+                    .includeMethod('com.OtherClass', 'unknownMethod')
+                    .includePattern('not.matching.pattern')
+            }
+        }
+
+        then:
+        def e = thrown(TestExecutionException)
+        normaliseLineSeparators(e.cause.message) == """No matching tests found in any candidate test task.
+    Requested tests:
+        Test class: example.UnknownClass in task :test
+        Test method com.OtherClass.[unknownMethod]() in task :test
+        Test package com.unknown in task :test
+        Test pattern not.matching.pattern in task :test"""
+    }
+}
