@@ -192,4 +192,34 @@ class TestLauncherTestSpecCrossVersionSpec extends TestLauncherSpec {
         Test package com.unknown in task :test
         Test pattern not.matching.pattern in task :test"""
     }
+
+    def "can use patterns in all include methods"() {
+        setup:
+        file('src/test/java/org/AnotherTest.java').text = '''
+            package org;
+            public class AnotherTest {
+                @org.junit.Test public void testThis() throws Exception {
+                     org.junit.Assert.assertEquals(1, 1);
+                }
+            }
+        '''
+
+        when:
+        launchTests { TestLauncher launcher ->
+            launcher.withTestsFor { TestSpec spec ->
+                spec.forTaskPath(':secondTest')
+                    .includePackage('o*g')
+                    .includeClass('example2.MyOtherT*')
+                    .includeMethod('example.MyT*', 'foo')
+                    .includePattern('example2.MyOther*2.ba*')
+            }
+        }
+
+        then:
+        events.testClassesAndMethods.size() == 8
+        assertTestExecuted(className: 'org.AnotherTest', methodName: 'testThis', task: ':secondTest')
+        assertTestExecuted(className: 'example2.MyOtherTest', methodName: 'bar', task: ':secondTest')
+        assertTestExecuted(className: 'example.MyTest', methodName: 'foo', task: ':secondTest')
+        assertTestExecuted(className: 'example2.MyOtherTest2', methodName: 'baz', task: ':secondTest')
+    }
 }
