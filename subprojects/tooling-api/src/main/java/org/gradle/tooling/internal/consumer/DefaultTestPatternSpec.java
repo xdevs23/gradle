@@ -90,7 +90,7 @@ public class DefaultTestPatternSpec implements TestPatternSpec, InternalTestPatt
     }
 
     @Override
-    public TestPatternSpec includePatterns(Collection<String>  patterns) {
+    public TestPatternSpec includePatterns(Collection<String> patterns) {
         this.patterns.addAll(patterns);
         return this;
     }

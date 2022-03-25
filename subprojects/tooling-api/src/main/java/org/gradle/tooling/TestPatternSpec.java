@@ -35,7 +35,8 @@ import java.util.Collection;
  * }).run();
  * </pre>
  * <p>
- * Test classes and methods accept patterns. Patterns follow the rules of <a href="https://docs.gradle.org/current/userguide/java_testing.html#test_filtering">Test Filtering</a>.
+ * All methods on this interface (including the class and method selection) support patterns as arguments. The patterns follow the rules of
+ * <a href="https://docs.gradle.org/current/userguide/java_testing.html#test_filtering">test filtering</a>.
  * <p>
  * The test execution will fail if any of the selected classes, methods, or patters have no matching tests.
  *
@@ -43,12 +44,83 @@ import java.util.Collection;
  */
 @Incubating
 public interface TestPatternSpec {
+
+    /**
+     * Adds all tests declared in the target package to the test execution.
+     * <p>
+     * The effect is recursive, meaning that the tests defined in sub-packages will also be executed.
+     *
+     * @param pkg The target package.
+     * @return this
+     */
     TestPatternSpec includePackage(String pkg);
+
+    /**
+     * Adds all tests declared in the target packages to the test execution.
+     *
+     * @see #includePackage(String)
+     * @param packages The target packages.
+     * @return this
+     */
     TestPatternSpec includePackages(Collection<String> packages);
+
+    /**
+     * Adds the target test class to the test execution.
+     * <p>
+     * The target class should be selected with its fully-qualified name.
+     *
+     * @param cls The fully-qualified name of the target class.
+     * @return this
+     */
     TestPatternSpec includeClass(String cls);
+
+    /**
+     * Adds the target test classes to the test execution.
+     *
+     * @see #includeClass(String)
+     * @param classes The fully-qualified name of the target classes.
+     * @return this
+     */
     TestPatternSpec includeClasses(Collection<String>  classes);
-    TestPatternSpec includeMethod(String clazz, String method);
-    TestPatternSpec includeMethods(String clazz, Collection<String> methods);
+
+    /**
+     * Adds the target test method to the test execution.
+     * <p>
+     * The target method should be selected with its fully-qualified class name and with the name of the method.
+     *
+     * @param cls The fully-qualified name of the class containing the method.
+     * @param method The name of the target method.
+     * @return this
+     */
+    TestPatternSpec includeMethod(String cls, String method);
+
+    /**
+     * Adds the target test methods to the test execution.
+     *
+     * @see #includeMethod(String, String)
+     * @param cls The fully-qualified name of the class containing the method.
+     * @param methods The name of the target methods.
+     * @return this
+     */
+    TestPatternSpec includeMethods(String cls, Collection<String> methods);
+
+    /**
+     * Adds all test classes and methods to the test execution that matches the target pattern.
+     * <p>
+     * The patterns follow the rules of
+     * <a href="https://docs.gradle.org/current/userguide/java_testing.html#test_filtering">test filtering</a>.
+     *
+     * @param pattern the pattern to select tests.
+     * @return this
+     */
     TestPatternSpec includePattern(String pattern);
-    TestPatternSpec includePatterns(Collection<String>  pattern);
+
+    /**
+     * Adds all test classes and methods to the test execution that matches the target patterns.
+     *
+     * @see #includePattern(String)
+     * @param patterns the patterns to select tests.
+     * @return this
+     */
+    TestPatternSpec includePatterns(Collection<String> patterns);
 }
