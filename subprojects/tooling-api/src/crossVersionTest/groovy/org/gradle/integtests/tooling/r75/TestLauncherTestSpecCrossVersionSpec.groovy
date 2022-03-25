@@ -210,7 +210,7 @@ class TestLauncherTestSpecCrossVersionSpec extends TestLauncherSpec {
                 spec.forTaskPath(':secondTest')
                     .includePackage('o*g')
                     .includeClass('example2.MyOtherT*')
-                    .includeMethod('example.MyT*', 'foo')
+                    .includeMethod('example.MyT*', 'f*o')
                     .includePattern('example2.MyOther*2.ba*')
             }
         }
