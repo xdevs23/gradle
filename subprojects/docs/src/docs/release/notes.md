@@ -51,6 +51,17 @@ We would like to thank the following community members for their contributions t
 [Dima Merkurev](https://github.com/dimorinny).
 [Matthew Haughton](https://github.com/3flex),
 [Kostya Tskhovrebov](https://github.com/terrakok)
+[aSemy](https://github.com/aSemy),
+[Rene Groeschke](https://github.com/breskeby),
+[Jonathan Leitschuh](https://github.com/JLLeitschuh),
+[Jamie Tanna](https://github.com/jamietanna),
+[Xin Wang](https://github.com/scaventz),
+[Alex Landau](https://github.com/AlexLandau)
+
+<!-- 
+Include only their name, impactful features should be called out separately below.
+ [Some person](https://github.com/some-person)
+-->
 
 ## Upgrade instructions
 
