@@ -328,6 +328,12 @@ include::sample[dir="snippets/dependencyManagement/catalogs-toml/groovy/buildSrc
 include::sample[dir="snippets/dependencyManagement/catalogs-toml/kotlin/buildSrc",files="settings.gradle.kts[tags=import_main_catalog]"]
 ====
 
+[WARNING]
+====
+If the link:{javadocPath}/org/gradle/api/initialization/dsl/VersionCatalogBuilder.html#from-java.lang.Object-[from] method was called once with a non-empty list of files,
+any further call will result in an exception.
+====
+
 This technique can therefore be used to declare multiple catalogs from different files:
 
 .Declaring additional catalogs
