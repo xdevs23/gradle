@@ -89,6 +89,7 @@ class SmokeTestGradleRunner extends GradleRunner {
      * @param warning the text of the warning to match.
      */
     SmokeTestGradleRunner expectLegacyDeprecationWarning(String warning) {
+        LOGGER.warn("Ignoring deprecation warnings because: {}", reason)
         expectedDeprecationWarnings.add(warning)
         return this
     }
