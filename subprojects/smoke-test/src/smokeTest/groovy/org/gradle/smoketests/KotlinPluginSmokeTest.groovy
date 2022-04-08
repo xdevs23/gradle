@@ -304,7 +304,7 @@ class KotlinPluginSmokeTest extends AbstractPluginValidatingSmokeTest implements
 
         void expectKotlin2JsPluginDeprecation(String version) {
             VersionNumber versionNumber = VersionNumber.parse(version)
-            runner.expectLegacyDeprecationWarningIf(versionNumber >= VersionNumber.parse('1.4.0') && versionNumber <= VersionNumber.parse('1.6.10'),
+            runner.expectLegacyDeprecationWarningIf(versionNumber >= VersionNumber.parse('1.4.0'),
                 "The `kotlin2js` Gradle plugin has been deprecated."
             )
         }
