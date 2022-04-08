@@ -60,6 +60,7 @@ class SmokeTestGradleRunner extends GradleRunner {
      */
     SmokeTestGradleRunner expectDeprecationWarning(String warning, String followup) {
         expectedDeprecationWarnings.add(warning)
+        println("Expecting deprecation warning: $warning")
         return this
     }
 
