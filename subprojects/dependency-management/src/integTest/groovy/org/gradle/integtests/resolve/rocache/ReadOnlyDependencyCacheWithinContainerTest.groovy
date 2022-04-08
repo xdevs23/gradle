@@ -27,7 +27,6 @@ import spock.lang.IgnoreIf
 
 import static org.gradle.util.TestPrecondition.HAS_DOCKER
 
-@Requires([HAS_DOCKER])
 @IgnoreIf({ GradleContextualExecuter.embedded }) // needs real Gradle distribution to run in container
 class ReadOnlyDependencyCacheWithinContainerTest extends AbstractReadOnlyCacheDependencyResolutionTest {
 

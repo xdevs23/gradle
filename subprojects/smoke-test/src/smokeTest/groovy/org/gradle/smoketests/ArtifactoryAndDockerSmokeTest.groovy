@@ -21,7 +21,6 @@ import org.gradle.util.Requires
 
 import static org.gradle.util.TestPrecondition.HAS_DOCKER
 
-@Requires(HAS_DOCKER)
 class ArtifactoryAndDockerSmokeTest extends AbstractPluginValidatingSmokeTest {
 
     @ToBeFixedForConfigurationCache
