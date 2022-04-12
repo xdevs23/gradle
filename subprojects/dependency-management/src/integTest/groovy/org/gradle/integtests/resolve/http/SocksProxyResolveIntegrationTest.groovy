@@ -19,6 +19,7 @@ package org.gradle.integtests.resolve.http
 import org.gradle.api.JavaVersion
 import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
 import org.gradle.test.fixtures.server.http.MavenHttpModule
+import org.gradle.test.fixtures.server.http.SocksProxyServer
 import org.gradle.test.fixtures.server.http.TestProxyServer
 import org.gradle.util.SetSystemProperties
 import org.hamcrest.CoreMatchers
@@ -28,13 +29,13 @@ class SocksProxyResolveIntegrationTest extends AbstractHttpDependencyResolutionT
 
     @Rule
     SetSystemProperties systemProperties = new SetSystemProperties()
-    protected TestProxyServer testSocksProxyServer
+    protected SocksProxyServer testSocksProxyServer
     MavenHttpModule module
 
     @Rule
-    TestProxyServer getProxyServer() {
+    SocksProxyServer getProxyServer() {
         if (testSocksProxyServer == null) {
-            testSocksProxyServer = new TestProxyServer(TestProxyServer.Type.SOCKS)
+            testSocksProxyServer = new SocksProxyServer()
         }
         return testSocksProxyServer
     }
@@ -54,6 +55,7 @@ task listJars {
 
     def "uses configured SOCKS proxy to access remote repository"() {
         given:
+        proxyServer.configureProxy(executer)
         proxyServer.start()
 
         and:
@@ -63,7 +65,7 @@ repositories {
 }
 """
         when:
-        proxyServer.configureSocksProxy(executer)
+        proxyServer.configureProxy(executer)
         module.allowAll()
 
         then:
@@ -78,7 +80,7 @@ repositories {
 }
 """
         when:
-        proxyServer.configureSocksProxy(executer)
+        proxyServer.configureProxy(executer)
         //executer.withArgument("-Dhttp.nonProxyHosts=")
         //executer.withArgument("-Dhttps.nonProxyHosts=")
         executer.withArgument("-DsocksNonProxyHosts=")
