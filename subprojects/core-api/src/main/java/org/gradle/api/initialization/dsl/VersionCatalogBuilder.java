@@ -50,7 +50,7 @@ public interface VersionCatalogBuilder extends Named {
      * The passed notation should conform these constraints:
      * <ul>
      *     <li>If a file notation is passed, it should be a single file.</li>
-     *     <li>If it's a resolvable dependency, it should resolve to a single file</li>
+     *     <li>If it's a resolvable dependency, it should resolve to a single file.</li>
      * </ul>
      *
      * <p>
