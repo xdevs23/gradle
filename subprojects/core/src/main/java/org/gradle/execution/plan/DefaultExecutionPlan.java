@@ -694,6 +694,9 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
     private void event(String message) {
         events.add(Thread.currentThread() + " " + message);
+        if (events.size() > 2000) {
+            events.subList(0, events.size() - 2000).clear();
+        }
     }
 
     private boolean attemptToStart(Node node, List<ResourceLock> resources) {
