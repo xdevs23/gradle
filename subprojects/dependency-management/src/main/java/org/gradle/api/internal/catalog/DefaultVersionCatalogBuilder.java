@@ -254,7 +254,7 @@ public class DefaultVersionCatalogBuilder implements VersionCatalogBuilderIntern
                 spec.withShortDescription("You can only call the 'from' method a single time")
                     .happensBecause("The method was called more than once")
                     .addSolution("Remove further usages of the method call")
-                    .documentedAt("platforms", "sec:importing-catalog-from-file")
+                    .documented()
             );
         }
     }
