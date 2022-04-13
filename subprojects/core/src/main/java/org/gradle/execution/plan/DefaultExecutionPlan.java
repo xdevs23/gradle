@@ -609,7 +609,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
             return Selection.noWorkReadyToStart();
         }
 
-        events.add("START SELECTION AT POS " + executionQueue.currentPos);
+        events.add("START SELECTION queue: " + executionQueue);
 
         List<ResourceLock> resources = new ArrayList<>();
         boolean foundReadyNode = false;
@@ -644,7 +644,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
                         if (attemptToStart(prepareNode, resources)) {
                             node.addDependencySuccessor(prepareNode);
                             node.forceAllDependenciesCompleteUpdate();
-                            events.add("SELECT PREPARE NODE " + prepareNode);
+                            events.add("SELECT PREPARE NODE " + prepareNode + ", queue=" + executionQueue);
                             return Selection.of(prepareNode);
                         } else {
                             // Cannot start prepare node, so skip to next node
@@ -656,7 +656,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
                 if (attemptToStart(node, resources)) {
                     executionQueue.remove();
-                    events.add("SELECT NODE " + node);
+                    events.add("SELECT NODE " + node + ", queue=" + executionQueue);
                     return Selection.of(node);
                 }
             } else if (node.isComplete()) {
@@ -682,7 +682,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
             // - they are ready to execute but cannot acquire the resources they need to start
             // - they are waiting for their dependencies to complete
             // - they are waiting for some external event (eg a task in another build to complete)
-            events.add("NO WORK READY TO START, pos=" + executionQueue.currentPos + ", queue=" + executionQueue.executionQueue);
+            events.add("NO WORK READY TO START, QUEUE: " + executionQueue);
             return Selection.noWorkReadyToStart();
         }
     }
@@ -1045,6 +1045,11 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         private final List<Node> executionQueue = new ArrayList<>();
         private final List<Node> priorityNodes = new ArrayList<>();
         private int currentPos = 0;
+
+        @Override
+        public String toString() {
+            return "pos=" + currentPos + " priority=" + priorityNodes + " queue=" + executionQueue;
+        }
 
         public void addAll(Collection<Node> nodes) {
             executionQueue.addAll(nodes);
