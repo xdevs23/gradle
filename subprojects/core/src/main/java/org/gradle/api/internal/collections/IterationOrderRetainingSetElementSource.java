@@ -17,14 +17,13 @@
 package org.gradle.api.internal.collections;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterators;
 import org.gradle.api.internal.provider.CollectionProviderInternal;
 import org.gradle.api.internal.provider.ProviderInternal;
 import org.gradle.api.specs.Spec;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public class IterationOrderRetainingSetElementSource<T> extends AbstractIterationOrderRetainingElementSource<T> {
     private final Spec<ValuePointer<T>> noDuplicates = new Spec<ValuePointer<T>>() {
@@ -33,12 +32,6 @@ public class IterationOrderRetainingSetElementSource<T> extends AbstractIteratio
             return !pointer.getElement().isDuplicate(pointer.getIndex());
         }
     };
-
-    /**
-     * Tracks the subset of values added with add() (without a Provider), allowing us to filter out duplicates
-     * from that subset in constant time.
-     */
-    private final Set<T> nonProvidedValues = new HashSet<>();
 
     @Override
     public Iterator<T> iterator() {
@@ -54,7 +47,7 @@ public class IterationOrderRetainingSetElementSource<T> extends AbstractIteratio
     @Override
     public boolean add(T element) {
         modCount++;
-        if (nonProvidedValues.add(element)) {
+        if (!Iterators.contains(iteratorNoFlush(), element)) {
             getInserted().add(new Element<T>(element));
             return true;
         } else {
@@ -77,18 +70,6 @@ public class IterationOrderRetainingSetElementSource<T> extends AbstractIteratio
                 markDuplicates(value);
             }
         }
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        nonProvidedValues.remove(o);
-        return super.remove(o);
-    }
-
-    @Override
-    public void clear() {
-        nonProvidedValues.clear();
-        super.clear();
     }
 
     private void markDuplicates(T value) {
