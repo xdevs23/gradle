@@ -263,8 +263,9 @@ public abstract class Node implements Comparable<Node> {
     }
 
     public void cancelExecution(Consumer<Node> completionAction) {
-        assert !isCannotRunInAnyPlan();
-        state = ExecutionState.NOT_SCHEDULED;
+        if (!isCannotRunInAnyPlan()) {
+            state = ExecutionState.NOT_SCHEDULED;
+        }
         completionAction.accept(this);
     }
 

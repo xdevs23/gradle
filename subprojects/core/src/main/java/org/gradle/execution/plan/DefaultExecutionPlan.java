@@ -366,8 +366,8 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
     @Override
     public WorkSource<Node> finalizePlan() {
         executionQueue.visitQueuedNodes(Node::updateAllDependenciesComplete);
+        maybeNodesReady = false;
         executionQueue.restart();
-        maybeNodesReady = true;
 
         events.add("execution plan: " + executionQueue.executionQueue);
 
@@ -378,6 +378,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
     private void resourceUnlocked(ResourceLock resourceLock) {
         if (!(resourceLock instanceof WorkerLeaseRegistry.WorkerLease) && maybeNodesReady) {
             event("RESTART SELECTION DUE TO RELEASED LOCK " + resourceLock + ", queue=" + executionQueue);
+            maybeNodesReady = false;
             executionQueue.restart();
         }
     }
@@ -613,7 +614,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         event("START SELECTION queue: " + executionQueue);
 
         List<ResourceLock> resources = new ArrayList<>();
-        boolean foundReadyNode = false;
         while (executionQueue.hasNext()) {
             Node node = executionQueue.next();
             if (node.allDependenciesComplete()) {
@@ -629,11 +629,12 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
                         node.markFailedDueToDependencies(this::recordNodeCompleted);
                     }
                     // Skipped some nodes, which may invalidate some earlier nodes (for example a shared dependency of multiple finalizers when all finalizers are skipped), so start again
+                    maybeNodesReady = false;
                     executionQueue.restart();
                     continue;
                 }
 
-                foundReadyNode = true;
+                maybeNodesReady = true;
 
                 Node prepareNode = node.getPrepareNode();
                 if (prepareNode != null) {
@@ -677,8 +678,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
             // - it is a finalizer for nodes that are not yet complete
         }
 
-        LOGGER.debug("No node could be selected, nodes ready: {}", foundReadyNode);
-        maybeNodesReady = foundReadyNode;
         if (executionQueue.isEmpty()) {
             event("NO MORE WORK TO START");
             return Selection.noMoreWorkToStart();
@@ -926,6 +925,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         try {
             if (maybeNodesReady) {
                 event("RESTART SELECTION DUE TO COMPLETED NODE " + node + ", queue=" + executionQueue);
+                maybeNodesReady = false;
                 executionQueue.restart();
             } else {
                 event("NO NODES READY ON COMPLETED NODE " + node + ", queue=" + executionQueue);
@@ -948,7 +948,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
     private void maybeNodeReady(Node node) {
         if (node.allDependenciesComplete()) {
             event("RESTART SELECTION DUE TO READY NODE " + node + ", queue=" + executionQueue);
-            maybeNodesReady = true;
+            maybeNodesReady = false;
             executionQueue.restart();
             if (node.isPriority()) {
                 executionQueue.isPriorityNode(node);
@@ -1034,6 +1034,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
             }
         });
         if (aborted) {
+            maybeNodesReady = false;
             executionQueue.restart();
         }
         return aborted;
