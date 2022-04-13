@@ -221,7 +221,7 @@ public class DefaultVersionCatalogBuilder implements VersionCatalogBuilderIntern
             throwVersionCatalogProblem(VersionCatalogProblemId.NO_IMPORT_FILES, spec ->
                 spec.withShortDescription("No files are resolved to be imported")
                     .happensBecause("The imported dependency doesn't resolve into any file")
-                    .addSolution("Check if the imported resource exists")
+                    .addSolution("Check if the import statement, it should be resolvable into a file")
                     .documented()
             );
         }

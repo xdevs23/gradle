@@ -510,7 +510,7 @@ ${solution}
 
     Reason: The imported dependency doesn't resolve into any file.
 
-    Possible solution: Check if the imported resource exists.
+    Possible solution: Check if the import statement, it should be resolvable into a file.
 
     ${documentation}"""
         }
