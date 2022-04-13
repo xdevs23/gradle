@@ -89,6 +89,10 @@ trait VersionCatalogErrorMessages {
         buildMessage(TooManyImportFiles, VersionCatalogProblemId.TOO_MANY_IMPORT_FILES, spec)
     }
 
+    String tooManyImportInvokation(@DelegatesTo(value=TooManyFromInvokation, strategy = Closure.DELEGATE_FIRST) Closure<?> spec) {
+        buildMessage(TooManyFromInvokation, VersionCatalogProblemId.TOO_MANY_IMPORT_INVOCATION, spec)
+    }
+
     private static <T extends InCatalog<T>> String buildMessage(Class<T> clazz, VersionCatalogProblemId id, Closure<?> spec) {
         def desc = clazz.newInstance()
         desc.section = id.name().toLowerCase()
@@ -525,6 +529,25 @@ ${solution}
     Reason: The import consists of multiple files.
 
     Possible solution: Only import a single file.
+
+    ${documentation}"""
+        }
+    }
+
+    static class TooManyFromInvokation extends InCatalog<TooManyFromInvokation> {
+        TooManyFromInvokation() {
+            intro = """Invalid catalog definition:
+"""
+            section = "importing-catalog-from-file"
+        }
+
+        @Override
+        String build() {
+            """${intro}  - Problem: In version catalog ${catalog}, you can only call the 'from' method a single time.
+
+    Reason: The method was called more than once.
+
+    Possible solution: Remove further usages of the method call.
 
     ${documentation}"""
         }

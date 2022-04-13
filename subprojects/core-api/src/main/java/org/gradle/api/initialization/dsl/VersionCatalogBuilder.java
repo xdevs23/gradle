@@ -46,14 +46,14 @@ public interface VersionCatalogBuilder extends Named {
      * a local TOML file.
      *
      * <p>
-     * This function can be called only once, further calls, the method will throw an error.
-     *
-     * <p>
+     * This function can be called only once, further calls will result in an error.<br/>
      * The passed notation should conform these constraints:
      * <ul>
      *     <li>If a file notation is passed, it should be a single file.</li>
      *     <li>If it's a resolvable dependency, it should resolve to a single file</li>
      * </ul>
+     *
+     * <p>
      * If the notation doesn't conform these constraints, an exception will be thrown at configuration time.
      *
      * @param dependencyNotation any notation supported by {@link org.gradle.api.artifacts.dsl.DependencyHandler}
@@ -67,7 +67,7 @@ public interface VersionCatalogBuilder extends Named {
      * @param alias an identifier for the version
      * @param versionSpec the dependency version spec
      * @return the version alias name
-     */
+     */®
     String version(String alias, Action<? super MutableVersionConstraint> versionSpec);
 
     /**

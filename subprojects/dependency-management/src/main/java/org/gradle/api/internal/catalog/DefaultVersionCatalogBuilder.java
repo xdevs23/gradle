@@ -250,11 +250,11 @@ public class DefaultVersionCatalogBuilder implements VersionCatalogBuilderIntern
         if (importedCatalog == null) {
             importedCatalog = new Import(dependencyNotation);
         } else {
-            throwVersionCatalogProblem(VersionCatalogProblemId.MULTIPLE_IMPORTS_CALLED, spec ->
+            throwVersionCatalogProblem(VersionCatalogProblemId.TOO_MANY_IMPORT_INVOCATION, spec ->
                 spec.withShortDescription("You can only call the 'from' method a single time")
                     .happensBecause("The method was called more than once")
                     .addSolution("Remove further usages of the method call")
-                    .documentedAt("platforms", "sec:sharing-catalogs")
+                    .documentedAt("platforms", "sec:importing-catalog-from-file")
             );
         }
     }

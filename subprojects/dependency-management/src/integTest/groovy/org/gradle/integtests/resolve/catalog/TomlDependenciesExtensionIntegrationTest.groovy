@@ -790,4 +790,42 @@ dependencyResolutionManagement {
         })
     }
 
+    @IgnoreRest
+    @Issue("https://github.com/gradle/gradle/issues/20383")
+    def "should throw an error if 'from' is called multiple times"() {
+        file('gradle/a.versions.toml') << """
+[versions]
+some = "1.4"
+
+[libraries]
+my-a-lib = { group = "com.mycompany", name="myalib", version.ref="some" }
+"""
+        file('gradle/b.versions.toml') << """
+[versions]
+some = "1.4"
+
+[libraries]
+my-b-lib = { group = "com.mycompany", name="myblib", version.ref="some" }
+"""
+
+        settingsFile << """
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("testLibs") {
+            from(file("gradle/a.versions.toml"))
+            from(file("gradle/b.versions.toml"))
+        }
+    }
+}
+"""
+
+        when:
+        fails 'help'
+
+        then:
+        verifyContains(failure.error, tooManyImportInvokation {
+            inCatalog("testLibs")
+        })
+    }
+
 }
