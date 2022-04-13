@@ -111,6 +111,8 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
     private boolean buildCancelled;
 
+    private final List<String> events = new ArrayList<>();
+
     public DefaultExecutionPlan(
         String displayName,
         TaskNodeFactory taskNodeFactory,
@@ -367,6 +369,8 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         executionQueue.restart();
         maybeNodesReady = true;
 
+        events.add("execution plan: " + executionQueue.executionQueue);
+
         // For now
         return this;
     }
@@ -581,6 +585,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         boolean cannotMakeProgress = state == State.NoWorkReadyToStart && runningNodes.isEmpty();
         if (cannotMakeProgress) {
             List<String> nodes = new ArrayList<>(executionQueue.size());
+            nodes.addAll(events);
             executionQueue.visitQueuedNodes(node -> {
                 if (!node.allDependenciesComplete()) {
                     nodes.add(node + " (dependencies not complete)");
@@ -604,6 +609,8 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
             return Selection.noWorkReadyToStart();
         }
 
+        events.add("START SELECTION AT POS " + executionQueue.currentPos);
+
         List<ResourceLock> resources = new ArrayList<>();
         boolean foundReadyNode = false;
         while (executionQueue.hasNext()) {
@@ -613,6 +620,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
                     // Cannot execute this node so skip it
                     // - some dependencies of the node failed
                     // - it is a finalizer for nodes that are all complete but did not execute
+                    events.add("SKIP NODE " + node);
                     executionQueue.remove();
                     if (node.shouldCancelExecutionDueToDependencies()) {
                         node.cancelExecution(this::recordNodeCompleted);
@@ -636,6 +644,7 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
                         if (attemptToStart(prepareNode, resources)) {
                             node.addDependencySuccessor(prepareNode);
                             node.forceAllDependenciesCompleteUpdate();
+                            events.add("SELECT PREPARE NODE " + prepareNode);
                             return Selection.of(prepareNode);
                         } else {
                             // Cannot start prepare node, so skip to next node
@@ -647,13 +656,16 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
                 if (attemptToStart(node, resources)) {
                     executionQueue.remove();
+                    events.add("SELECT NODE " + node);
                     return Selection.of(node);
                 }
             } else if (node.isComplete()) {
                 // node is complete
                 // - it is a priority node that has already executed
+                events.add("REMOVE COMPLETED NODE " + node);
                 executionQueue.remove();
             }
+            events.add("NODE IS NOT READY " + node);
             // Else, node is not yet complete
             // - its dependencies are not yet complete
             // - it is waiting for some external event such as completion of a task in another build
@@ -663,12 +675,14 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         LOGGER.debug("No node could be selected, nodes ready: {}", foundReadyNode);
         maybeNodesReady = foundReadyNode;
         if (executionQueue.isEmpty()) {
+            events.add("NO MORE WORK TO START");
             return Selection.noMoreWorkToStart();
         } else {
             // Some tasks are yet to start
             // - they are ready to execute but cannot acquire the resources they need to start
             // - they are waiting for their dependencies to complete
             // - they are waiting for some external event (eg a task in another build to complete)
+            events.add("NO WORK READY TO START, pos=" + executionQueue.currentPos + ", queue=" + executionQueue.executionQueue);
             return Selection.noWorkReadyToStart();
         }
     }
