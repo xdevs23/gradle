@@ -46,7 +46,7 @@ public interface VersionCatalogBuilder extends Named {
      * a local TOML file.
      *
      * <p>
-     * This function can be called only once, further calls will result in an error.<br/>
+     * This function can be called only once, further calls will result in an error.
      * The passed notation should conform these constraints:
      * <ul>
      *     <li>If a file notation is passed, it should be a single file.</li>
