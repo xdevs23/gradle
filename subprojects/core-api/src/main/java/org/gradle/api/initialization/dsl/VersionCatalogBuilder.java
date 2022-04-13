@@ -67,7 +67,7 @@ public interface VersionCatalogBuilder extends Named {
      * @param alias an identifier for the version
      * @param versionSpec the dependency version spec
      * @return the version alias name
-     */®
+     */
     String version(String alias, Action<? super MutableVersionConstraint> versionSpec);
 
     /**
