@@ -111,8 +111,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
     private boolean buildCancelled;
 
-    private final List<String> events = new ArrayList<>();
-
     public DefaultExecutionPlan(
         String displayName,
         TaskNodeFactory taskNodeFactory,
@@ -369,15 +367,12 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         maybeNodesReady = false;
         executionQueue.restart();
 
-        events.add("execution plan: " + executionQueue.executionQueue);
-
         // For now
         return this;
     }
 
     private void resourceUnlocked(ResourceLock resourceLock) {
         if (!(resourceLock instanceof WorkerLeaseRegistry.WorkerLease) && maybeNodesReady) {
-            event("RESTART SELECTION DUE TO RELEASED LOCK " + resourceLock + ", queue=" + executionQueue);
             maybeNodesReady = false;
             executionQueue.restart();
         }
@@ -587,7 +582,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         boolean cannotMakeProgress = state == State.NoWorkReadyToStart && runningNodes.isEmpty();
         if (cannotMakeProgress) {
             List<String> nodes = new ArrayList<>(executionQueue.size());
-            nodes.addAll(events);
             executionQueue.visitQueuedNodes(node -> {
                 if (!node.allDependenciesComplete()) {
                     nodes.add(node + " (dependencies not complete)");
@@ -611,8 +605,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
             return Selection.noWorkReadyToStart();
         }
 
-        event("START SELECTION queue: " + executionQueue);
-
         List<ResourceLock> resources = new ArrayList<>();
         while (executionQueue.hasNext()) {
             Node node = executionQueue.next();
@@ -621,7 +613,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
                     // Cannot execute this node so skip it
                     // - some dependencies of the node failed
                     // - it is a finalizer for nodes that are all complete but did not execute
-                    event("SKIP NODE " + node);
                     executionQueue.remove();
                     if (node.shouldCancelExecutionDueToDependencies()) {
                         node.cancelExecution(this::recordNodeCompleted);
@@ -646,11 +637,9 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
                         if (attemptToStart(prepareNode, resources)) {
                             node.addDependencySuccessor(prepareNode);
                             node.forceAllDependenciesCompleteUpdate();
-                            event("SELECT PREPARE NODE " + prepareNode + ", queue=" + executionQueue);
                             return Selection.of(prepareNode);
                         } else {
                             // Cannot start prepare node, so skip to next node
-                            event("CANNOT START PREPARE NODE " + prepareNode + ", queue=" + executionQueue);
                             continue;
                         }
                     }
@@ -659,18 +648,12 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
                 if (attemptToStart(node, resources)) {
                     executionQueue.remove();
-                    event("SELECT NODE " + node + ", queue=" + executionQueue);
                     return Selection.of(node);
-                } else {
-                    event("CANNOT START NODE " + node + ", queue=" + executionQueue);
                 }
             } else if (node.isComplete()) {
                 // node is complete
                 // - it is a priority node that has already executed
-                event("REMOVE COMPLETED NODE " + node);
                 executionQueue.remove();
-            } else {
-                event("NODE IS NOT READY " + node);
             }
             // Else, node is not yet complete
             // - its dependencies are not yet complete
@@ -679,22 +662,13 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         }
 
         if (executionQueue.isEmpty()) {
-            event("NO MORE WORK TO START");
             return Selection.noMoreWorkToStart();
         } else {
             // Some tasks are yet to start
             // - they are ready to execute but cannot acquire the resources they need to start
             // - they are waiting for their dependencies to complete
             // - they are waiting for some external event (eg a task in another build to complete)
-            event("NO WORK READY TO START, QUEUE: " + executionQueue);
             return Selection.noWorkReadyToStart();
-        }
-    }
-
-    private void event(String message) {
-        events.add(Thread.currentThread() + " " + message);
-        if (events.size() > 2000) {
-            events.subList(0, events.size() - 2000).clear();
         }
     }
 
@@ -924,11 +898,8 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
         }
         try {
             if (maybeNodesReady) {
-                event("RESTART SELECTION DUE TO COMPLETED NODE " + node + ", queue=" + executionQueue);
                 maybeNodesReady = false;
                 executionQueue.restart();
-            } else {
-                event("NO NODES READY ON COMPLETED NODE " + node + ", queue=" + executionQueue);
             }
             runningNodes.remove(node);
             node.finishExecution(this::recordNodeCompleted);
@@ -947,7 +918,6 @@ public class DefaultExecutionPlan implements ExecutionPlan, WorkSource<Node> {
 
     private void maybeNodeReady(Node node) {
         if (node.allDependenciesComplete()) {
-            event("RESTART SELECTION DUE TO READY NODE " + node + ", queue=" + executionQueue);
             maybeNodesReady = false;
             executionQueue.restart();
             if (node.isPriority()) {

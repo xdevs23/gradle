@@ -711,13 +711,12 @@ class DefaultExecutionPlanParallelTest extends AbstractExecutionPlanSpec {
         when:
         finishedExecuting(firstTaskNode)
         then:
-        assertNoWorkReadyToStart()
+        assertNoWorkReadyToStartAfterSelect()
 
         when:
         finishedExecuting(secondTaskNode)
         then:
         selectNextTask() == c
-
     }
 
     def "two tasks that have the same file in outputs are not executed in parallel"() {
